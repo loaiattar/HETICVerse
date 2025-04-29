@@ -397,6 +397,10 @@ export interface ApiCommentComment extends Struct.CollectionTypeSchema {
     >;
     post: Schema.Attribute.Relation<'manyToOne', 'api::post.post'>;
     publishedAt: Schema.Attribute.DateTime;
+    sub_hetic_verse: Schema.Attribute.Relation<
+      'manyToOne',
+      'api::sub-hetic-verse.sub-hetic-verse'
+    >;
     updatedAt: Schema.Attribute.DateTime;
     updatedBy: Schema.Attribute.Relation<'oneToOne', 'admin::user'> &
       Schema.Attribute.Private;
@@ -406,6 +410,7 @@ export interface ApiCommentComment extends Struct.CollectionTypeSchema {
 export interface ApiPostPost extends Struct.CollectionTypeSchema {
   collectionName: 'posts';
   info: {
+    description: '';
     displayName: ' Post';
     pluralName: 'posts';
     singularName: 'post';
@@ -432,11 +437,48 @@ export interface ApiPostPost extends Struct.CollectionTypeSchema {
     localizations: Schema.Attribute.Relation<'oneToMany', 'api::post.post'>;
     publishe_time: Schema.Attribute.DateTime;
     publishedAt: Schema.Attribute.DateTime;
+    sub_hetic_verses: Schema.Attribute.Relation<
+      'oneToMany',
+      'api::sub-hetic-verse.sub-hetic-verse'
+    >;
     title: Schema.Attribute.String;
     updatedAt: Schema.Attribute.DateTime;
     updatedBy: Schema.Attribute.Relation<'oneToOne', 'admin::user'> &
       Schema.Attribute.Private;
     Users: Schema.Attribute.Relation<'oneToMany', 'api::comment.comment'>;
+  };
+}
+
+export interface ApiSubHeticVerseSubHeticVerse
+  extends Struct.CollectionTypeSchema {
+  collectionName: 'sub_hetic_verses';
+  info: {
+    displayName: 'SubHETICVerse';
+    pluralName: 'sub-hetic-verses';
+    singularName: 'sub-hetic-verse';
+  };
+  options: {
+    draftAndPublish: true;
+  };
+  attributes: {
+    createdAt: Schema.Attribute.DateTime;
+    createdBy: Schema.Attribute.Relation<'oneToOne', 'admin::user'> &
+      Schema.Attribute.Private;
+    description: Schema.Attribute.Blocks;
+    locale: Schema.Attribute.String & Schema.Attribute.Private;
+    localizations: Schema.Attribute.Relation<
+      'oneToMany',
+      'api::sub-hetic-verse.sub-hetic-verse'
+    > &
+      Schema.Attribute.Private;
+    name: Schema.Attribute.String;
+    post: Schema.Attribute.Relation<'manyToOne', 'api::post.post'>;
+    posts: Schema.Attribute.Relation<'oneToMany', 'api::comment.comment'>;
+    publishedAt: Schema.Attribute.DateTime;
+    slug: Schema.Attribute.UID<'name'>;
+    updatedAt: Schema.Attribute.DateTime;
+    updatedBy: Schema.Attribute.Relation<'oneToOne', 'admin::user'> &
+      Schema.Attribute.Private;
   };
 }
 
@@ -986,6 +1028,7 @@ declare module '@strapi/strapi' {
       'admin::user': AdminUser;
       'api::comment.comment': ApiCommentComment;
       'api::post.post': ApiPostPost;
+      'api::sub-hetic-verse.sub-hetic-verse': ApiSubHeticVerseSubHeticVerse;
       'api::vote.vote': ApiVoteVote;
       'plugin::content-releases.release': PluginContentReleasesRelease;
       'plugin::content-releases.release-action': PluginContentReleasesReleaseAction;

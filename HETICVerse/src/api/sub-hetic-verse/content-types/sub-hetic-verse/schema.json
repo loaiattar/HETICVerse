@@ -1,0 +1,36 @@
+{
+  "kind": "collectionType",
+  "collectionName": "sub_hetic_verses",
+  "info": {
+    "singularName": "sub-hetic-verse",
+    "pluralName": "sub-hetic-verses",
+    "displayName": "SubHETICVerse"
+  },
+  "options": {
+    "draftAndPublish": true
+  },
+  "attributes": {
+    "name": {
+      "type": "string"
+    },
+    "description": {
+      "type": "blocks"
+    },
+    "slug": {
+      "type": "uid",
+      "targetField": "name"
+    },
+    "posts": {
+      "type": "relation",
+      "relation": "oneToMany",
+      "target": "api::comment.comment",
+      "mappedBy": "sub_hetic_verse"
+    },
+    "post": {
+      "type": "relation",
+      "relation": "manyToOne",
+      "target": "api::post.post",
+      "inversedBy": "sub_hetic_verses"
+    }
+  }
+}

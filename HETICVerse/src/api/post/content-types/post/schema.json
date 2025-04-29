@@ -4,7 +4,8 @@
   "info": {
     "singularName": "post",
     "pluralName": "posts",
-    "displayName": " Post"
+    "displayName": " Post",
+    "description": ""
   },
   "options": {
     "draftAndPublish": true
@@ -41,6 +42,12 @@
       "relation": "oneToMany",
       "target": "api::comment.comment",
       "mappedBy": "author"
+    },
+    "sub_hetic_verses": {
+      "type": "relation",
+      "relation": "oneToMany",
+      "target": "api::sub-hetic-verse.sub-hetic-verse",
+      "mappedBy": "post"
     }
   }
 }
