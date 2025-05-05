@@ -65,11 +65,23 @@
       "inversedBy": "users",
       "configurable": false
     },
-    "post": {
+    "comments": {
       "type": "relation",
-      "relation": "manyToOne",
+      "relation": "oneToMany",
+      "target": "api::comment.comment",
+      "mappedBy": "author"
+    },
+    "sub_hetic_verses": {
+      "type": "relation",
+      "relation": "oneToMany",
+      "target": "api::sub-hetic-verse.sub-hetic-verse",
+      "mappedBy": "owner"
+    },
+    "posts": {
+      "type": "relation",
+      "relation": "oneToMany",
       "target": "api::post.post",
-      "inversedBy": "author"
+      "mappedBy": "author"
     }
   }
 }

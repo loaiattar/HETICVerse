@@ -386,7 +386,10 @@ export interface ApiCommentComment extends Struct.CollectionTypeSchema {
     };
   };
   attributes: {
-    author: Schema.Attribute.Relation<'manyToOne', 'api::post.post'>;
+    author: Schema.Attribute.Relation<
+      'manyToOne',
+      'plugin::users-permissions.user'
+    >;
     content: Schema.Attribute.Blocks;
     createdAt: Schema.Attribute.DateTime;
     createdBy: Schema.Attribute.Relation<'oneToOne', 'admin::user'> &
@@ -399,10 +402,6 @@ export interface ApiCommentComment extends Struct.CollectionTypeSchema {
     >;
     post: Schema.Attribute.Relation<'manyToOne', 'api::post.post'>;
     publishedAt: Schema.Attribute.DateTime;
-    sub_hetic_verse: Schema.Attribute.Relation<
-      'manyToOne',
-      'api::sub-hetic-verse.sub-hetic-verse'
-    >;
     updatedAt: Schema.Attribute.DateTime;
     updatedBy: Schema.Attribute.Relation<'oneToOne', 'admin::user'> &
       Schema.Attribute.Private;
@@ -427,7 +426,7 @@ export interface ApiPostPost extends Struct.CollectionTypeSchema {
   };
   attributes: {
     author: Schema.Attribute.Relation<
-      'oneToMany',
+      'manyToOne',
       'plugin::users-permissions.user'
     >;
     comments: Schema.Attribute.Relation<'oneToMany', 'api::comment.comment'>;
@@ -438,17 +437,15 @@ export interface ApiPostPost extends Struct.CollectionTypeSchema {
     image: Schema.Attribute.Media<'images' | 'files' | 'videos' | 'audios'>;
     locale: Schema.Attribute.String;
     localizations: Schema.Attribute.Relation<'oneToMany', 'api::post.post'>;
-    publishe_time: Schema.Attribute.DateTime;
     publishedAt: Schema.Attribute.DateTime;
-    sub_hetic_verses: Schema.Attribute.Relation<
-      'oneToMany',
+    sub_hetic_verse: Schema.Attribute.Relation<
+      'manyToOne',
       'api::sub-hetic-verse.sub-hetic-verse'
     >;
     title: Schema.Attribute.String;
     updatedAt: Schema.Attribute.DateTime;
     updatedBy: Schema.Attribute.Relation<'oneToOne', 'admin::user'> &
       Schema.Attribute.Private;
-    Users: Schema.Attribute.Relation<'oneToMany', 'api::comment.comment'>;
   };
 }
 
@@ -456,6 +453,7 @@ export interface ApiSubHeticVerseSubHeticVerse
   extends Struct.CollectionTypeSchema {
   collectionName: 'sub_hetic_verses';
   info: {
+    description: '';
     displayName: 'SubHETICVerse';
     pluralName: 'sub-hetic-verses';
     singularName: 'sub-hetic-verse';
@@ -467,7 +465,7 @@ export interface ApiSubHeticVerseSubHeticVerse
     createdAt: Schema.Attribute.DateTime;
     createdBy: Schema.Attribute.Relation<'oneToOne', 'admin::user'> &
       Schema.Attribute.Private;
-    description: Schema.Attribute.Blocks;
+    description: Schema.Attribute.String;
     locale: Schema.Attribute.String & Schema.Attribute.Private;
     localizations: Schema.Attribute.Relation<
       'oneToMany',
@@ -475,8 +473,11 @@ export interface ApiSubHeticVerseSubHeticVerse
     > &
       Schema.Attribute.Private;
     name: Schema.Attribute.String;
-    post: Schema.Attribute.Relation<'manyToOne', 'api::post.post'>;
-    posts: Schema.Attribute.Relation<'oneToMany', 'api::comment.comment'>;
+    owner: Schema.Attribute.Relation<
+      'manyToOne',
+      'plugin::users-permissions.user'
+    >;
+    posts: Schema.Attribute.Relation<'oneToMany', 'api::post.post'>;
     publishedAt: Schema.Attribute.DateTime;
     slug: Schema.Attribute.UID<'name'>;
     updatedAt: Schema.Attribute.DateTime;
@@ -978,6 +979,7 @@ export interface PluginUsersPermissionsUser
   };
   attributes: {
     blocked: Schema.Attribute.Boolean & Schema.Attribute.DefaultTo<false>;
+    comments: Schema.Attribute.Relation<'oneToMany', 'api::comment.comment'>;
     confirmationToken: Schema.Attribute.String & Schema.Attribute.Private;
     confirmed: Schema.Attribute.Boolean & Schema.Attribute.DefaultTo<false>;
     createdAt: Schema.Attribute.DateTime;
@@ -999,13 +1001,17 @@ export interface PluginUsersPermissionsUser
       Schema.Attribute.SetMinMaxLength<{
         minLength: 6;
       }>;
-    post: Schema.Attribute.Relation<'manyToOne', 'api::post.post'>;
+    posts: Schema.Attribute.Relation<'oneToMany', 'api::post.post'>;
     provider: Schema.Attribute.String;
     publishedAt: Schema.Attribute.DateTime;
     resetPasswordToken: Schema.Attribute.String & Schema.Attribute.Private;
     role: Schema.Attribute.Relation<
       'manyToOne',
       'plugin::users-permissions.role'
+    >;
+    sub_hetic_verses: Schema.Attribute.Relation<
+      'oneToMany',
+      'api::sub-hetic-verse.sub-hetic-verse'
     >;
     updatedAt: Schema.Attribute.DateTime;
     updatedBy: Schema.Attribute.Relation<'oneToOne', 'admin::user'> &

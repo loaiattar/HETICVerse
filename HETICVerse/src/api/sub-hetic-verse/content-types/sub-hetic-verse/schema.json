@@ -4,7 +4,8 @@
   "info": {
     "singularName": "sub-hetic-verse",
     "pluralName": "sub-hetic-verses",
-    "displayName": "SubHETICVerse"
+    "displayName": "SubHETICVerse",
+    "description": ""
   },
   "options": {
     "draftAndPublish": true
@@ -13,24 +14,24 @@
     "name": {
       "type": "string"
     },
-    "description": {
-      "type": "blocks"
-    },
     "slug": {
       "type": "uid",
       "targetField": "name"
     },
+    "owner": {
+      "type": "relation",
+      "relation": "manyToOne",
+      "target": "plugin::users-permissions.user",
+      "inversedBy": "sub_hetic_verses"
+    },
     "posts": {
       "type": "relation",
       "relation": "oneToMany",
-      "target": "api::comment.comment",
+      "target": "api::post.post",
       "mappedBy": "sub_hetic_verse"
     },
-    "post": {
-      "type": "relation",
-      "relation": "manyToOne",
-      "target": "api::post.post",
-      "inversedBy": "sub_hetic_verses"
+    "description": {
+      "type": "string"
     }
   }
 }
