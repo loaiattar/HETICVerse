@@ -48,6 +48,16 @@
       "relation": "oneToMany",
       "target": "api::sub-hetic-verse.sub-hetic-verse",
       "mappedBy": "post"
+    },
+    "image": {
+      "allowedTypes": [
+        "images",
+        "files",
+        "videos",
+        "audios"
+      ],
+      "type": "media",
+      "multiple": false
     }
   }
 }
