@@ -25,11 +25,16 @@
     "publishe_time": {
       "type": "datetime"
     },
-    "author": {
+      "author": {
+      "type": "relation",
+      "relation": "manyToOne",
+      "target": "plugin::users-permissions.user"
+    },
+      "posts": {
       "type": "relation",
       "relation": "oneToMany",
-      "target": "plugin::users-permissions.user",
-      "mappedBy": "post"
+      "target": "api::post.post",
+      "mappedBy": "author"
     },
     "comments": {
       "type": "relation",

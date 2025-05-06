@@ -425,7 +425,7 @@ export interface ApiPostPost extends Struct.CollectionTypeSchema {
   };
   attributes: {
     author: Schema.Attribute.Relation<
-      'oneToMany',
+      'manyToOne',
       'plugin::users-permissions.user'
     >;
     comments: Schema.Attribute.Relation<'oneToMany', 'api::comment.comment'>;
@@ -435,6 +435,7 @@ export interface ApiPostPost extends Struct.CollectionTypeSchema {
       Schema.Attribute.Private;
     locale: Schema.Attribute.String;
     localizations: Schema.Attribute.Relation<'oneToMany', 'api::post.post'>;
+    posts: Schema.Attribute.Relation<'oneToMany', 'api::post.post'>;
     publishe_time: Schema.Attribute.DateTime;
     publishedAt: Schema.Attribute.DateTime;
     sub_hetic_verses: Schema.Attribute.Relation<

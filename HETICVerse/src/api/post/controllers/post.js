@@ -1,17 +1,16 @@
 /**
  * post controller
  */
+'use strict';
 
-import { factories } from '@strapi/strapi';
-const { createCoreController } = factories;
+const { createCoreController } = require('@strapi/strapi').factories;
 
-export default createCoreController('api::post.post', ({ strapi }) => ({
+module.exports = createCoreController('api::post.post', ({ strapi }) => ({
   async find(ctx) {
-    const { data, meta } = await super.find(ctx);
+    const { data, meta } = await super.find(ctx); // Calls the default controller find method
     const sortedData = data.sort((a, b) =>
       new Date(b.attributes.createdAt) - new Date(a.attributes.createdAt)
     );
-
     return { data: sortedData, meta };
   },
 }));

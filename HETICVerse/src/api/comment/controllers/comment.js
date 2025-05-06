@@ -2,33 +2,28 @@
  * comment controller
  */
 
-import { factories } from '@strapi/strapi';
-const { createCoreController } = factories;
+'use strict';
 
-export default createCoreController('api::comment.comment', ({ strapi }) => ({
-  async find(ctx) {
-    // Fetch with relations: post and author
-    const { data, meta } = await super.find(ctx);
+const { createCoreController } = require('@strapi/strapi').factories;
 
-    // Sort by createdAt (newest first)
-    const sortedData = data.sort((a, b) =>
-      new Date(b.attributes.createdAt) - new Date(a.attributes.createdAt)
-    );
+module.exports = createCoreController('api::comment.comment', ({ strapi }) => {
+  return {
+    async find(ctx) {
+      const { data, meta } = await super.find(ctx);
+      const sortedData = data.sort((a, b) =>
+        new Date(b.attributes.createdAt) - new Date(a.attributes.createdAt)
+      );
+      return { data: sortedData, meta };
+    },
 
-    return { data: sortedData, meta };
-  },
+    async create(ctx) {
+      const user = ctx.state.user;
+      if (user) {
+        ctx.request.body.data.author = user.id;
+      }
+      return await super.create(ctx);
+    },
+  };
+});
 
-  async create(ctx) {
-    // Get the current user from context if needed
-    const user = ctx.state.user;
 
-    // auto-link user to comment
-    if (user) {
-      ctx.request.body.data.author = user.id;
-    }
-
-    // Proceed with default create
-    const response = await super.create(ctx);
-    return response;
-  },
-}));
