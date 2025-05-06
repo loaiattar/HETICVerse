@@ -24,12 +24,6 @@
       "target": "api::post.post",
       "inversedBy": "comments"
     },
-    "author": {
-      "type": "relation",
-      "relation": "manyToOne",
-      "target": "api::post.post",
-      "inversedBy": "Users"
-    },
     "sub_hetic_verse": {
       "type": "relation",
       "relation": "manyToOne",

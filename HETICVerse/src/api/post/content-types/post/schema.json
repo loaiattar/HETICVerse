@@ -19,17 +19,13 @@
     "title": {
       "type": "string"
     },
-    "content": {
-      "type": "blocks"
-    },
     "publishe_time": {
       "type": "datetime"
     },
     "author": {
       "type": "relation",
-      "relation": "oneToMany",
-      "target": "plugin::users-permissions.user",
-      "mappedBy": "post"
+      "relation": "manyToOne",
+      "target": "plugin::users-permissions.user"
     },
     "comments": {
       "type": "relation",
@@ -37,17 +33,24 @@
       "target": "api::comment.comment",
       "mappedBy": "post"
     },
-    "Users": {
-      "type": "relation",
-      "relation": "oneToMany",
-      "target": "api::comment.comment",
-      "mappedBy": "author"
+    "image": {
+      "allowedTypes": [
+        "images",
+        "files",
+        "videos",
+        "audios"
+      ],
+      "type": "media",
+      "multiple": true
     },
-    "sub_hetic_verses": {
+    "content": {
+      "type": "text"
+    },
+    "sub_hetic_verse": {
       "type": "relation",
-      "relation": "oneToMany",
+      "relation": "manyToOne",
       "target": "api::sub-hetic-verse.sub-hetic-verse",
-      "mappedBy": "post"
+      "inversedBy": "posts"
     }
   }
 }

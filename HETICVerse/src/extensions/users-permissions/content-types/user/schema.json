@@ -70,6 +70,12 @@
       "relation": "manyToOne",
       "target": "api::post.post",
       "inversedBy": "author"
+    },
+    "sub_hetic_verses": {
+      "type": "relation",
+      "relation": "oneToMany",
+      "target": "api::sub-hetic-verse.sub-hetic-verse",
+      "mappedBy": "author"
     }
   }
 }
