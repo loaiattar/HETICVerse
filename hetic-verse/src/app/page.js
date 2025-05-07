@@ -16,7 +16,7 @@ export default async function LogInPage() {
         HETIC<span className="text-white">V.</span>
       </header>
 
-      <div className="w-full max-w-md p-8 rounded-2xl bg-[#2B3236] shadow-xl shadow-[#3FDEE1]/30">
+      <div className="w-full max-w-md p-8 rounded-2xl bg-[#2B3236] shadow-[0_-0px_50px_-5px_rgba(63,222,225,0.4)] shadow-[#3FDEE1]/100">
         <h1 className="text-2xl font-semibold text-white text-center mb-2">
           Bienvenue sur <span className="text-[#3FDEE1]">HETIC</span>Verse
         </h1>
