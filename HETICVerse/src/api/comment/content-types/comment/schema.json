@@ -19,33 +19,28 @@
     "content": {
       "type": "blocks"
     },
-    "post": {
-      "type": "relation",
-      "relation": "manyToOne",
-      "target": "api::post.post",
-      "inversedBy": "comments"
-    },
     "author": {
       "type": "relation",
       "relation": "manyToOne",
-      "target": "api::post.post",
-      "inversedBy": "Users"
-    },
-    "sub_hetic_verse": {
-      "type": "relation",
-      "relation": "manyToOne",
-      "target": "api::sub-hetic-verse.sub-hetic-verse",
-      "inversedBy": "posts"
+      "target": "plugin::users-permissions.user",
+      "inversedBy": "comments"
     },
     "image": {
+      "type": "media",
+      "multiple": false,
+      "required": false,
       "allowedTypes": [
         "images",
         "files",
         "videos",
         "audios"
-      ],
-      "type": "media",
-      "multiple": false
+      ]
+    },
+    "post": {
+      "type": "relation",
+      "relation": "manyToOne",
+      "target": "api::post.post",
+      "inversedBy": "comments"
     }
   }
 }

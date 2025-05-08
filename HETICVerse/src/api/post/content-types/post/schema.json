@@ -22,42 +22,34 @@
     "content": {
       "type": "blocks"
     },
-    "publishe_time": {
-      "type": "datetime"
-    },
     "author": {
       "type": "relation",
-      "relation": "oneToMany",
+      "relation": "manyToOne",
       "target": "plugin::users-permissions.user",
-      "mappedBy": "post"
+      "inversedBy": "posts"
+    },
+    "image": {
+      "type": "media",
+      "multiple": false,
+      "required": false,
+      "allowedTypes": [
+        "images",
+        "files",
+        "videos",
+        "audios"
+      ]
+    },
+    "sub_hetic_verse": {
+      "type": "relation",
+      "relation": "manyToOne",
+      "target": "api::sub-hetic-verse.sub-hetic-verse",
+      "inversedBy": "posts"
     },
     "comments": {
       "type": "relation",
       "relation": "oneToMany",
       "target": "api::comment.comment",
       "mappedBy": "post"
-    },
-    "Users": {
-      "type": "relation",
-      "relation": "oneToMany",
-      "target": "api::comment.comment",
-      "mappedBy": "author"
-    },
-    "sub_hetic_verses": {
-      "type": "relation",
-      "relation": "oneToMany",
-      "target": "api::sub-hetic-verse.sub-hetic-verse",
-      "mappedBy": "post"
-    },
-    "image": {
-      "allowedTypes": [
-        "images",
-        "files",
-        "videos",
-        "audios"
-      ],
-      "type": "media",
-      "multiple": false
     }
   }
 }
