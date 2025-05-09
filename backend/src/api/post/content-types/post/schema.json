@@ -58,5 +58,15 @@
       "target": "api::vote.vote",
       "mappedBy": "post"
     }
+    },
+    "scheduledFor": {
+    "type": "datetime",
+    "private": true
+  },
+  "status": {
+    "type": "enumeration",
+    "enum": ["draft", "scheduled", "published"],
+    "default": "draft"
   }
+  
 }
