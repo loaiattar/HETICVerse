@@ -1,0 +1,32 @@
+{
+    "kind": "collectionType",
+    "collectionName": "moderators",
+    "info": {
+      "singularName": "moderator",
+      "pluralName": "moderators",
+      "displayName": "Community Moderator"
+    },
+    "options": {
+      "draftAndPublish": false
+    },
+    "attributes": {
+      "user": {
+        "type": "relation",
+        "relation": "manyToOne",
+        "target": "plugin::users-permissions.user"
+      },
+      "sub_hetic_verse": {
+        "type": "relation",
+        "relation": "manyToOne",
+        "target": "api::sub-hetic-verse.sub-hetic-verse"
+      },
+      "permissions": {
+        "type": "json"
+      },
+      "addedBy": {
+        "type": "relation",
+        "relation": "manyToOne",
+        "target": "plugin::users-permissions.user"
+      }
+    }
+  }

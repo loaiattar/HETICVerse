@@ -1,0 +1,41 @@
+{
+    "kind": "collectionType",
+    "collectionName": "analytics",
+    "info": {
+      "singularName": "analytic",
+      "pluralName": "analytics",
+      "displayName": "User Analytics"
+    },
+    "options": {
+      "draftAndPublish": false
+    },
+    "attributes": {
+      "user": {
+        "type": "relation",
+        "relation": "oneToOne",
+        "target": "plugin::users-permissions.user"
+      },
+      "lastActive": {
+        "type": "datetime"
+      },
+      "postsCreated": {
+        "type": "integer",
+        "default": 0
+      },
+      "commentsCreated": {
+        "type": "integer",
+        "default": 0
+      },
+      "votesGiven": {
+        "type": "integer",
+        "default": 0
+      },
+      "karma": {
+        "type": "integer",
+        "default": 0
+      },
+      "loginHistory": {
+        "type": "json"
+      }
+    }
+  }

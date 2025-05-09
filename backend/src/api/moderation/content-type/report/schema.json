@@ -1,0 +1,53 @@
+{
+    "kind": "collectionType",
+    "collectionName": "reports",
+    "info": {
+      "singularName": "report",
+      "pluralName": "reports",
+      "displayName": "Content Report"
+    },
+    "options": {
+      "draftAndPublish": false
+    },
+    "attributes": {
+      "reporter": {
+        "type": "relation",
+        "relation": "manyToOne",
+        "target": "plugin::users-permissions.user"
+      },
+      "contentType": {
+        "type": "enumeration",
+        "enum": ["post", "comment", "sub-hetic-verse", "user"]
+      },
+      "contentId": {
+        "type": "integer"
+      },
+      "reason": {
+        "type": "enumeration",
+        "enum": [
+          "inappropriate",
+          "spam",
+          "harassment",
+          "misinformation",
+          "copyright",
+          "other"
+        ]
+      },
+      "details": {
+        "type": "text"
+      },
+      "status": {
+        "type": "enumeration",
+        "enum": ["pending", "reviewed", "actioned", "dismissed"],
+        "default": "pending"
+      },
+      "moderatorNotes": {
+        "type": "text"
+      },
+      "moderatedBy": {
+        "type": "relation",
+        "relation": "manyToOne",
+        "target": "plugin::users-permissions.user"
+      }
+    }
+  }
