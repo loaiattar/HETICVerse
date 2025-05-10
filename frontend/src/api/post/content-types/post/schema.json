@@ -52,5 +52,15 @@
       "target": "api::sub-hetic-verse.sub-hetic-verse",
       "inversedBy": "posts"
     }
+    },
+    "scheduledFor": {
+    "type": "datetime",
+    "private": true
+  },
+  "status": {
+    "type": "enumeration",
+    "enum": ["draft", "scheduled", "published"],
+    "default": "draft"
   }
+  
 }
