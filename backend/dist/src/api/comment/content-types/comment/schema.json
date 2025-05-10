@@ -1,0 +1,34 @@
+{
+    "kind": "collectionType",
+    "collectionName": "comments",
+    "info": {
+        "singularName": "comment",
+        "pluralName": "comments",
+        "displayName": "Comment"
+    },
+    "options": {
+        "draftAndPublish": true
+    },
+    "pluginOptions": {
+        "i18n": {
+            "localized": true
+        }
+    },
+    "attributes": {
+        "content": {
+            "type": "blocks"
+        },
+        "post": {
+            "type": "relation",
+            "relation": "manyToOne",
+            "target": "api::post.post",
+            "inversedBy": "comments"
+        },
+        "sub_hetic_verse": {
+            "type": "relation",
+            "relation": "manyToOne",
+            "target": "api::sub-hetic-verse.sub-hetic-verse",
+            "inversedBy": "posts"
+        }
+    }
+}
