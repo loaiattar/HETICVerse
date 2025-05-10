@@ -1,12 +1,114 @@
 'use client'
 
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
+import { useRouter } from 'next/navigation'
 import Communities from '../component/communities'
 import RecentCommunities from '../component/recent_communities'
 import PostCard from '../component/post_card'
+import axios from 'axios'
 
 export default function Home() {
+  const router = useRouter()
   const [selectedButton, setSelectedButton] = useState('home')
+  const [posts, setPosts] = useState([])
+  const [loading, setLoading] = useState(true)
+  const [error, setError] = useState('')
+
+  const createTestPost = async () => {
+    try {
+      const token = localStorage.getItem('token')
+      const response = await axios.post(
+        'http://localhost:1337/api/posts',
+        {
+          data: {
+            title: 'Mon premier post',
+            content: 'Ceci est un post de test',
+          },
+        },
+        {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        }
+      )
+      return response.data
+    } catch (error) {
+      console.error('Erreur lors de la création du post de test:', error)
+      return null
+    }
+  }
+
+  const fetchPosts = async () => {
+    try {
+      const token = localStorage.getItem('token')
+      if (!token) {
+        setError('Vous devez être connecté pour voir les posts')
+        setLoading(false)
+        return
+      }
+
+      console.log('Fetching posts with token:', token)
+      const response = await axios.get('http://localhost:1337/api/posts?populate=*', {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      })
+
+      console.log('Posts response:', response.data)
+
+      if (response.data && response.data.data) {
+        if (response.data.data.length === 0) {
+          console.log('No posts found, creating test post')
+          const testPost = await createTestPost()
+          if (testPost) {
+            console.log('Test post created:', testPost)
+            // Re-fetch posts after creating test post
+            const newResponse = await axios.get('http://localhost:1337/api/posts?populate=*', {
+              headers: {
+                Authorization: `Bearer ${token}`,
+              },
+            })
+            setPosts(newResponse.data.data)
+          }
+        } else {
+          setPosts(response.data.data)
+        }
+        setError('')
+      } else {
+        setPosts([])
+        setError('Aucun post trouvé')
+      }
+    } catch (error) {
+      console.error('Erreur complète lors du chargement des posts:', error)
+      if (error.response?.status === 403) {
+        setError('Vous n\'avez pas les permissions nécessaires. Veuillez vous connecter.')
+        router.push('/login')
+      } else if (error.response?.status === 404) {
+        setError('Aucun post trouvé')
+        setPosts([])
+      } else {
+        setError('Erreur lors du chargement des posts. Veuillez réessayer.')
+      }
+    } finally {
+      setLoading(false)
+    }
+  }
+
+  useEffect(() => {
+    fetchPosts()
+  }, [])
+
+  // Ajouter un effet pour recharger les posts quand on revient sur la page
+  useEffect(() => {
+    const handleRouteChange = () => {
+      fetchPosts()
+    }
+
+    window.addEventListener('popstate', handleRouteChange)
+    return () => {
+      window.removeEventListener('popstate', handleRouteChange)
+    }
+  }, [])
 
   const handleButtonClick = (button) => {
     setSelectedButton(button)
@@ -27,13 +129,11 @@ export default function Home() {
               onClick={() => handleButtonClick('home')}
             >
               {selectedButton === 'home' ? (
-              <svg xmlns="http://www.w3.org/2000/svg" fill='white' viewBox="0 0 48 48" width="24px" height="24px"><path d="M39.5,43h-9c-1.381,0-2.5-1.119-2.5-2.5v-9c0-1.105-0.895-2-2-2h-4c-1.105,0-2,0.895-2,2v9c0,1.381-1.119,2.5-2.5,2.5h-9	C7.119,43,6,41.881,6,40.5V21.413c0-2.299,1.054-4.471,2.859-5.893L23.071,4.321c0.545-0.428,1.313-0.428,1.857,0L39.142,15.52	C40.947,16.942,42,19.113,42,21.411V40.5C42,41.881,40.881,43,39.5,43z"/></svg>
-
+                <svg xmlns="http://www.w3.org/2000/svg" fill='white' viewBox="0 0 48 48" width="24px" height="24px"><path d="M39.5,43h-9c-1.381,0-2.5-1.119-2.5-2.5v-9c0-1.105-0.895-2-2-2h-4c-1.105,0-2,0.895-2,2v9c0,1.381-1.119,2.5-2.5,2.5h-9	C7.119,43,6,41.881,6,40.5V21.413c0-2.299,1.054-4.471,2.859-5.893L23.071,4.321c0.545-0.428,1.313-0.428,1.857,0L39.142,15.52	C40.947,16.942,42,19.113,42,21.411V40.5C42,41.881,40.881,43,39.5,43z"/></svg>
               ) : (
-                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                <svg width="24" height="24" viewBox="0 0 24 24" fill="white" xmlns="http://www.w3.org/2000/svg">
                   <path d="M11.9756 1.99999C11.8157 2.00545 11.6617 2.06191 11.5361 2.16113L4.42968 7.75976C3.52773 8.47057 3 9.55675 3 10.7051V20.25C3 20.9318 3.5682 21.5 4.25 21.5H9.25C9.93179 21.5 10.5 20.9318 10.5 20.25V15.25C10.5 15.1025 10.6025 15 10.75 15H13.25C13.3975 15 13.5 15.1025 13.5 15.25V20.25C13.5 20.9318 14.0682 21.5 14.75 21.5H19.75C20.4318 21.5 21 20.9318 21 20.25V10.7051C21 9.55675 20.4722 8.47058 19.5703 7.75976L12.4639 2.16113C12.3252 2.05157 12.1522 1.9945 11.9756 1.99999ZM12 3.70507L18.6426 8.93847C19.1846 9.36565 19.5 10.0154 19.5 10.7051V20H15V15.25C15 14.2925 14.2075 13.5 13.25 13.5H10.75C9.79252 13.5 9 14.2925 9 15.25V20H4.5V10.7051C4.5 10.0154 4.81537 9.36565 5.35742 8.93847L12 3.70507Z" fill="white"/>
                 </svg>
-
               )}
               <span className="font-bold">Home</span>
             </a>
@@ -104,7 +204,10 @@ export default function Home() {
           </div>
           
           <div className="flex items-center space-x-4">
-            <button className="flex flex-row justify-center items-center gap-1 px-2 py-2 rounded-full text-sm font-medium hover:bg-[#333D42]">
+            <button 
+              onClick={() => router.push('/create')}
+              className="flex flex-row justify-center items-center gap-1 px-2 py-2 rounded-full text-sm font-medium hover:bg-[#333D42]"
+            >
               <svg xmlns="http://www.w3.org/2000/svg" height="24px" viewBox="0 -960 960 960" width="24px" fill="#FFFFFF"><path d="M440-440H200v-80h240v-240h80v240h240v80H520v240h-80v-240Z"/></svg>
               Create
             </button>
@@ -117,8 +220,21 @@ export default function Home() {
           </div>
         </header>
 
-        <PostCard/>
-        
+        {loading ? (
+          <div className="flex justify-center items-center h-64">
+            <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-[#3FDEE1]"></div>
+          </div>
+        ) : error ? (
+          <div className="flex justify-center items-center h-64">
+            <p className="text-red-400">{error}</p>
+          </div>
+        ) : (
+          <div className="space-y-4">
+            {posts.map((post) => (
+              <PostCard key={post.id} postId={post.id} />
+            ))}
+          </div>
+        )}
       </div>
     </div>
   );

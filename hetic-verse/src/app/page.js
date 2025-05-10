@@ -2,8 +2,10 @@
 
 import axios from 'axios';
 import { useState } from 'react';
+import { useRouter } from 'next/navigation';
 
 export default function RegisterPage() {
+  const router = useRouter();
   const [email, setEmail] = useState('');
   const [username, setUsername] = useState('');
   const [password, setPassword] = useState('');
@@ -13,6 +15,8 @@ export default function RegisterPage() {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
+    setError('');
+    setSuccess('');
 
     if (password !== confirmPassword) {
       setError('Les mots de passe ne correspondent pas.');
@@ -21,19 +25,24 @@ export default function RegisterPage() {
 
     try {
       const response = await axios.post('http://localhost:1337/api/auth/local/register', {
-        username,
-        email,
-        password,
+        username: username,
+        email: email,
+        password: password,
       });
 
-      setSuccess("Inscription réussie !");
-      setError('');
-      console.log('User profile:', response.data.user);
-      console.log('User token:', response.data.jwt);
+      // Stocker le token et les informations utilisateur dans le localStorage
+      localStorage.setItem('token', response.data.jwt);
+      localStorage.setItem('user', JSON.stringify(response.data.user));
 
-      // Optionnel : rediriger ou stocker le token
+      console.log('User profile', response.data.user);
+      console.log('User token', response.data.jwt);
+      setSuccess('Inscription réussie !');
+      setTimeout(() => {
+        router.push('/home');
+      }, 1000);
     } catch (err) {
-      setError(err.response?.data?.error?.message || "Erreur lors de l'inscription.");
+      setError('Erreur l\'inscription. Veuillez réessayer.');
+      console.error(err.response || err);
     }
   };
 
@@ -48,7 +57,7 @@ export default function RegisterPage() {
           Bienvenue sur <span className="text-[#3FDEE1]">HETIC</span>Verse
         </h1>
         <p className="text-sm text-gray-400 text-center mb-6">
-          En continuant, tu acceptes notre Contrat d utilisation et reconnais que tu comprends notre Politique de confidentialité.
+          En continuant, tu acceptes notre Contrat d&apos;utilisation et reconnais que tu comprends notre Politique de confidentialité.
         </p>
 
         <form onSubmit={handleSubmit} className="space-y-4">

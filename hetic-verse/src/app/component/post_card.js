@@ -7,27 +7,75 @@ export default function PostCard({ postId }) {
   const [activeButton, setActiveButton] = useState(null)
   const [voteCount, setVoteCount] = useState(0)
   const [postData, setPostData] = useState(null)
+  const [loading, setLoading] = useState(true)
+  const [error, setError] = useState(null)
 
   useEffect(() => {
     const fetchPost = async () => {
       try {
-        const response = await axios.get(`http://localhost:1337/api/posts/${postId}?populate=*`)
-        if (response.status === 200) {
+        const token = localStorage.getItem('token')
+        if (!token) {
+          setError('Vous devez être connecté pour voir les posts')
+          setLoading(false)
+          return
+        }
+
+        console.log('Fetching post with ID:', postId)
+        console.log('Using token:', token)
+
+        const response = await axios.get(`http://localhost:1337/api/posts/${postId}?populate=*`, {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        })
+
+        console.log('Post response:', response.data)
+
+        if (response.status === 200 && response.data && response.data.data) {
           setPostData(response.data.data)
           setVoteCount(response.data.data.attributes.upvotes || 0)
+          setError(null)
+        } else {
+          console.error('Invalid response format:', response.data)
+          setError('Format de réponse invalide')
         }
-      } catch (error) {
-        console.error('Error fetching post:', error)
+      } catch (err) {
+        console.error('Erreur détaillée lors du chargement du post:', {
+          status: err.response?.status,
+          data: err.response?.data,
+          message: err.message
+        })
+        
+        if (err.response?.status === 404) {
+          setError('Post non trouvé')
+        } else if (err.response?.status === 403) {
+          setError('Vous n\'avez pas les permissions nécessaires')
+        } else {
+          setError(`Erreur lors du chargement du post: ${err.message}`)
+        }
+      } finally {
+        setLoading(false)
       }
     }
 
     if (postId) {
+      console.log('PostCard mounted with ID:', postId)
       fetchPost()
+    } else {
+      console.error('PostCard mounted without postId')
+      setError('ID du post manquant')
+      setLoading(false)
     }
   }, [postId])
 
   const handleClick = async (button) => {
     try {
+      const token = localStorage.getItem('token')
+      if (!token) {
+        setError('Vous devez être connecté pour voter')
+        return
+      }
+
       if (button === 'blue') {
         const newVoteCount = activeButton === button ? voteCount - 1 : voteCount + 1
         const response = await axios.put(`http://localhost:1337/api/posts/${postId}`, {
@@ -37,6 +85,7 @@ export default function PostCard({ postId }) {
         }, {
           headers: {
             'Content-Type': 'application/json',
+            Authorization: `Bearer ${token}`,
           }
         })
 
@@ -47,6 +96,7 @@ export default function PostCard({ postId }) {
       }
     } catch (error) {
       console.error('Error updating post:', error)
+      setError('Erreur lors de la mise à jour du vote')
     }
   }
 
@@ -56,13 +106,34 @@ export default function PostCard({ postId }) {
     return ''
   }
 
+  if (loading) {
+    return (
+      <div className="bg-[#2B3236] rounded-lg shadow p-4 animate-pulse">
+        <div className="h-4 bg-gray-700 rounded w-3/4 mb-4"></div>
+        <div className="h-4 bg-gray-700 rounded w-1/2"></div>
+      </div>
+    )
+  }
+
+  if (error) {
+    return (
+      <div className="bg-[#2B3236] rounded-lg shadow p-4">
+        <p className="text-red-400">{error}</p>
+      </div>
+    )
+  }
+
   if (!postData) {
-    return <div>Loading...</div>
+    return (
+      <div className="bg-[#2B3236] rounded-lg shadow p-4">
+        <p className="text-gray-400">Post non trouvé</p>
+      </div>
+    )
   }
 
   return(
     <div className="max-w-3xl mx-auto py-6 px-4">
-      <div className="rounded-md overflow-hidden hover:bg-[#181C1F]">
+      <div className="bg-[#2B3236] rounded-lg shadow">
         <div className="p-4">
           <div className="flex items-center mb-2">
             <div className="w-6 h-6 bg-gray-600 rounded-full mr-2"></div>
@@ -82,7 +153,7 @@ export default function PostCard({ postId }) {
             </div>
           </div>
           
-          <h2 className="text-xl font-medium mb-2">{postData.attributes.title}</h2>
+          <h2 className="text-xl font-medium mb-2 text-white">{postData.attributes.title}</h2>
           <p className="text-sm text-gray-300 mb-4">
             {postData.attributes.content}
           </p>
@@ -98,40 +169,28 @@ export default function PostCard({ postId }) {
             </div>
           )}
           
-          <div className="flex items-center mt-4 space-x-4">
-            <div className="flex items-center space-x-1">
-              <div className={`flex flex-row items-center justify-center gap-3 w-min h-8 rounded-full bg-[#2B3236] px-2 py-5 transition-all ${getShadowClass()}`}>
-                <div className="flex flex-row items-center justify-center gap-1 w-min h-8 rounded-full bg-[#2B3236] px-2 py-5">
-                  <button className="rounded-full hover:bg-[#333D42]" onClick={() => handleClick('blueForce')}>
-                    <svg xmlns="http://www.w3.org/2000/svg" height="24px" transform="rotate(180)" viewBox="0 -960 960 960" width="24px" fill={activeButton === 'blueForce' ? '#3FDEE1' : '#FFFFFF'}>
-                      <path d="M480-83 240-323l56-56 184 183 184-183 56 56L480-83Zm0-238L240-561l56-56 184 183 184-183 56 56-240 240Zm0-238L240-799l56-56 184 183 184-183 56 56-240 240Z"/>
-                    </svg>
-                  </button>
-
-                  <button className="rounded-full hover:bg-[#333D42]" onClick={() => handleClick('blue')}>
-                    <svg xmlns="http://www.w3.org/2000/svg" height="24px" viewBox="0 -960 960 960" width="24px" fill={activeButton === 'blue' ? '#3FDEE1' : '#FFFFFF'}>
-                      <path d="M320-120v-320H120l360-440 360 440H640v320H320Zm80-80h160v-320h111L480-754 289-520h111v320Zm80-320Z"/>
-                    </svg>
-                  </button>
-
-                  <span className="text-sm font-medium">{voteCount}</span>
-                </div>
-
-                <button className="rounded-full hover:bg-[#333D42]" onClick={() => handleClick('red')}>
-                  <svg xmlns="http://www.w3.org/2000/svg" height="24px" transform="rotate(180)" viewBox="0 -960 960 960" width="24px" fill={activeButton === 'red' ? '#F13636' : '#FFFFFF'}><path d="M320-120v-320H120l360-440 360 440H640v320H320Zm80-80h160v-320h111L480-754 289-520h111v320Zm80-320Z"/></svg>
+          <div className="flex items-center space-x-1">
+            <div className={`flex flex-row items-center justify-center gap-3 w-min h-8 rounded-full bg-[#2B3236] px-2 py-5 transition-all ${getShadowClass()}`}>
+              <div className="flex flex-row items-center justify-center gap-1 w-min h-8 rounded-full bg-[#2B3236] px-2 py-5">
+                <button className="rounded-full hover:bg-[#333D42]" onClick={() => handleClick('blueForce')}>
+                  <svg xmlns="http://www.w3.org/2000/svg" height="24px" transform="rotate(180)" viewBox="0 -960 960 960" width="24px" fill={activeButton === 'blueForce' ? '#3FDEE1' : '#FFFFFF'}>
+                    <path d="M480-83 240-323l56-56 184 183 184-183 56 56L480-83Zm0-238L240-561l56-56 184 183 184-183 56 56-240 240Zm0-238L240-799l56-56 184 183 184-183 56 56-240 240Z"/>
+                  </svg>
                 </button>
+
+                <button className="rounded-full hover:bg-[#333D42]" onClick={() => handleClick('blue')}>
+                  <svg xmlns="http://www.w3.org/2000/svg" height="24px" viewBox="0 -960 960 960" width="24px" fill={activeButton === 'blue' ? '#3FDEE1' : '#FFFFFF'}>
+                    <path d="M320-120v-320H120l360-440 360 440H640v320H320Zm80-80h160v-320h111L480-754 289-520h111v320Zm80-320Z"/>
+                  </svg>
+                </button>
+
+                <span className="text-sm font-medium text-white">{voteCount}</span>
               </div>
+
+              <button className="rounded-full hover:bg-[#333D42]" onClick={() => handleClick('red')}>
+                <svg xmlns="http://www.w3.org/2000/svg" height="24px" transform="rotate(180)" viewBox="0 -960 960 960" width="24px" fill={activeButton === 'red' ? '#F13636' : '#FFFFFF'}><path d="M320-120v-320H120l360-440 360 440H640v320H320Zm80-80h160v-320h111L480-754 289-520h111v320Zm80-320Z"/></svg>
+              </button>
             </div>
-            
-            <button className="flex items-center jusstify-center space-x-1 text-white bg-[#2B3236] hover:bg-[#333D42] w-min h-8 px-3 py-5 gap-1 rounded-full">
-              <svg xmlns="http://www.w3.org/2000/svg" height="24px" viewBox="0 -960 960 960" width="24px" fill="#FFFFFF"><path d="M240-400h480v-80H240v80Zm0-120h480v-80H240v80Zm0-120h480v-80H240v80ZM880-80 720-240H160q-33 0-56.5-23.5T80-320v-480q0-33 23.5-56.5T160-880h640q33 0 56.5 23.5T880-800v720ZM160-320h594l46 45v-525H160v480Zm0 0v-480 480Z"/></svg>
-              <span className="text-sm font-medium">2.1K</span>
-            </button>
-            
-            <button className="flex items-center jusstify-center space-x-1 text-white bg-[#2B3236] hover:bg-[#333D42] w-min h-8 px-3 py-5 gap-1 rounded-full">
-              <svg xmlns="http://www.w3.org/2000/svg" height="24px" viewBox="0 -960 960 960" width="24px" fill="#FFFFFF"><path d="M680-80q-50 0-85-35t-35-85q0-6 3-28L282-392q-16 15-37 23.5t-45 8.5q-50 0-85-35t-35-85q0-50 35-85t85-35q24 0 45 8.5t37 23.5l281-164q-2-7-2.5-13.5T560-760q0-50 35-85t85-35q50 0 85 35t35 85q0 50-35 85t-85 35q-24 0-45-8.5T598-672L317-508q2 7 2.5 13.5t.5 14.5q0 8-.5 14.5T317-452l281 164q16-15 37-23.5t45-8.5q50 0 85 35t35 85q0 50-35 85t-85 35Zm0-80q17 0 28.5-11.5T720-200q0-17-11.5-28.5T680-240q-17 0-28.5 11.5T640-200q0 17 11.5 28.5T680-160ZM200-440q17 0 28.5-11.5T240-480q0-17-11.5-28.5T200-520q-17 0-28.5 11.5T160-480q0 17 11.5 28.5T200-440Zm480-280q17 0 28.5-11.5T720-760q0-17-11.5-28.5T680-800q-17 0-28.5 11.5T640-760q0 17 11.5 28.5T680-720Zm0 520ZM200-480Zm480-280Z"/></svg>
-              <span className="text-sm">Share</span>
-            </button>
           </div>
         </div>
       </div>
