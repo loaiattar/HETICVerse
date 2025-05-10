@@ -2,55 +2,74 @@
  * vote controller
  */
 
-import { factories } from '@strapi/strapi';
-
-export default factories.createCoreController('api::vote.vote', ({ strapi }) => {
-  return {
-    async create(ctx) {
-      const user = ctx.state.user;
-
-      if (!user) {
-        return ctx.unauthorized('You must be logged in to vote');
+module.exports = createCoreController('api::vote.vote', ({ strapi }) => ({
+  async create(ctx) {
+    const { user } = ctx.state;
+    const { post, type } = ctx.request.body;
+    
+    // Check if user already voted on this post
+    const existingVote = await strapi.db.query('api::vote.vote').findOne({
+      where: { 
+        post: post,
+        users_permissions_user: user.id
       }
-
-      const { post, comment, value } = ctx.request.body.data;
-
-      if (!post && !comment) {
-        return ctx.badRequest('A vote must be linked to a post or a comment');
-      }
-
-      const existingVote = await strapi.entityService.findMany('api::vote.vote', {
-        filters: {
-          user: user.id,
-          ...(post ? { post } : {}),
-          ...(comment ? { comment } : {})
-        },
-      });
-
-      if (existingVote.length > 0) {
-        const updatedVote = await strapi.entityService.update('api::vote.vote', existingVote[0].id, {
-          data: { value },
+    });
+    
+    if (existingVote) {
+      // Update vote if already exists
+      if (existingVote.Vote === type) {
+        // Remove vote if clicking same type again
+        await strapi.entityService.delete('api::vote.vote', existingVote.id);
+        
+        // Update post karma count
+        await this.updatePostKarma(post);
+        
+        return { message: 'Vote removed' };
+      } else {
+        // Change vote type
+        const updated = await strapi.entityService.update('api::vote.vote', existingVote.id, {
+          data: { Vote: type }
         });
-        return { data: updatedVote };
+        
+        // Update post karma count
+        await this.updatePostKarma(post);
+        
+        return updated;
       }
-
-      //  Use core controller’s create
-      const { create } = factories.createCoreController('api::vote.vote')({ strapi });
-      return await create(ctx);
-    },
-
-    async find(ctx) {
-      //  Use core controller’s find
-      const { find } = factories.createCoreController('api::vote.vote')({ strapi });
-      const { data, meta } = await find(ctx);
-
-      const enrichedData = await Promise.all(data.map(async (vote) => {
-        return await strapi.entityService.findOne('api::vote.vote', vote.id, {
-          populate: ['post', 'comment', 'user'],
-        });
-      }));
-
-      return { data: enrichedData, meta };
+    } else {
+      // Create new vote
+      const vote = await super.create(ctx);
+      
+      // Update post karma count
+      await this.updatePostKarma(post);
+      
+      return vote;
     }
-  };
-});
+  },
+  
+  // Helper to update post karma
+  async updatePostKarma(postId) {
+    const upvotes = await strapi.db.query('api::vote.vote').count({
+      where: { 
+        post: postId,
+        Vote: 'upvote'
+      }
+    });
+    
+    const downvotes = await strapi.db.query('api::vote.vote').count({
+      where: { 
+        post: postId,
+        Vote: 'downvote'
+      }
+    });
+    
+    const karma = upvotes - downvotes;
+    
+    // Update post with karma count if you add this field
+    await strapi.entityService.update('api::post.post', postId, {
+      data: { karma }
+    });
+    
+    return karma;
+  }
+}));
