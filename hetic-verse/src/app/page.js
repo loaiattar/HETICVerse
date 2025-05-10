@@ -39,7 +39,7 @@ export default function RegisterPage() {
 
   return (
     <div className="min-h-screen bg-gradient-to-b from-[#0a0a0a] to-[#171717] flex flex-col items-center justify-center px-4">
-      <header className="absolute top-4 left-4 text-xl font-bold text-[#3FDEE1]">
+      <header className="absolute top-4 left-4 text-xl font-bold  text-[#3FDEE1]" style={{ fontFamily: 'Baloo Da 2' }}>
         HETIC<span className="text-white">V.</span>
       </header>
 
