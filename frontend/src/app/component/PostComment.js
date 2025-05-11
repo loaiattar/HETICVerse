@@ -2,13 +2,32 @@ import React, { useState } from 'react'
 
 export default function PostComment() {
     const [selectedVote, setSelectedVote] = useState(null)
+    const [voteCount, setVoteCount] = useState(8)
 
     const handleUpvote = () => {
-        setSelectedVote(selectedVote === 'upvote' ? null : 'upvote')
+        if (selectedVote === 'upvote') {
+            // enlève son up vote et diminuer le compteur
+            setSelectedVote(null)
+            setVoteCount(prevCount => prevCount - 1)
+        } else {
+            // up vote et augmenter le count
+            setSelectedVote('upvote')
+            setVoteCount(prevCount => prevCount + 1)
+        }
     }
 
     const handleDownvote = () => {
-        setSelectedVote(selectedVote === 'downvote' ? null : 'downvote')
+        if (selectedVote === 'upvote') {
+            // passe du up au down vote et diminuer le count
+            setSelectedVote('downvote')
+            setVoteCount(prevCount => prevCount - 1)
+        } else if (selectedVote === 'downvote') {
+            // down vote, pas d'incidence sur le count
+            setSelectedVote(null)
+        }
+        else {
+          setSelectedVote('downvote')
+        }
     }
 
     return (
@@ -41,7 +60,7 @@ export default function PostComment() {
                     <svg width="15" height="15" viewBox="0 0 15 15" fill="none" xmlns="http://www.w3.org/2000/svg">
                         <path d="M5 13.125V8.125H1.875L7.5 1.25L13.125 8.125H10V13.125H5ZM6.25 11.875H8.75V6.875H10.4844L7.5 3.21875L4.51562 6.875H6.25V11.875Z" fill={selectedVote === 'upvote' ? '#3FDEE1' : '#C7C7C7'}/>
                     </svg>
-                    <span>8</span>
+                    <span>{voteCount}</span>
                 </div>
     
                 {/* Downvote */}
