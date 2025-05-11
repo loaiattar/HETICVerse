@@ -1,0 +1,33 @@
+{
+  "kind": "collectionType",
+  "collectionName": "bookmarks",
+  "info": {
+    "singularName": "bookmark",
+    "pluralName": "bookmarks",
+    "displayName": "Bookmark",
+    "description": "User bookmarked posts"
+  },
+  "options": {
+    "draftAndPublish": false
+  },
+  "attributes": {
+    "user": {
+      "type": "relation",
+      "relation": "manyToOne",
+      "target": "plugin::users-permissions.user"
+    },
+    "post": {
+      "type": "relation",
+      "relation": "manyToOne",
+      "target": "api::post.post"
+    },
+    "notes": {
+      "type": "text",
+      "description": "User's personal notes about this bookmarked post"
+    },
+    "collection": {
+      "type": "string",
+      "description": "Optional category/collection name for organizing bookmarks"
+    }
+  }
+}
