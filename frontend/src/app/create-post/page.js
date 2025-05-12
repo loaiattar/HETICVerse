@@ -3,10 +3,14 @@
 import { useState } from 'react'
 import Communities from '../component/FollowedCommunities'
 import RecentCommunities from '../component/RecentCommunities'
+import PostTextForm from '../component/TextPostForm'
 import UploadMedia from '../component/UploadMedia'
+import PostLinkForm from '../component/PostLinkForm'
+
 
 export default function Home() {
   const [selectedButton, setSelectedButton] = useState('home')
+  const [activeComponent, setActiveComponent] = useState('text')
   const [showUploadMedia, setShowUploadMedia] = useState(false)
 
   const handleButtonClick = (button) => {
@@ -123,7 +127,7 @@ export default function Home() {
         </header>
 
         <div className='flex justify-center w-full'>
-            <div className="flex flex-col items-start min-h-screen text-white p-6">
+            <div className="flex flex-col items-start w-2xl text-white p-6">
                 <h1 className="text-2xl font-semibold mb-6">Create post</h1>
 
                 <div className="mb-4">
@@ -143,33 +147,29 @@ export default function Home() {
                 </div>
 
                 <div className="flex space-x-6 mb-6 pb-2">
-                    <button className="text-white font-medium border-b-2 border-[#3FDEE1]">Text</button>
-                    <button className="text-zinc-400 hover:text-white" onClick={handleToggleUploadMedia}>
-                        Image & video
-                    </button>
-                    <button className="text-zinc-400 hover:text-white">Link</button>
-                </div>
-
-                {showUploadMedia ? (
-                    <UploadMedia />
-                ) : (
-                    <div>
-                        <textarea
-                            placeholder="Title"
-                            rows={5}
-                            className="w-2xl bg-transparent border border-zinc-600 rounded-2xl px-4 py-3 text-white placeholder-[#C7C7C7] resize-none focus:outline-none focus:ring-1 focus:ring-blue-500"
-                        />
-                    </div>
-                )}
-
-                <div className="flex justify-end w-full mt-2">
-                    <button
-                        type="submit"
-                        className="bg-[#105BCA] hover:bg-[#1B489D] text-white font-semibold px-4 py-2 rounded-full "
+                    <button 
+                      className={`text-white font-medium ${activeComponent === 'text' ? 'border-b-2 border-[#3FDEE1]' : ''}`} 
+                      onClick={() => setActiveComponent('text')}
                     >
-                        Post
+                      Text
+                    </button>
+                    <button 
+                      className={`text-zinc-400 hover:text-white ${activeComponent === 'media' ? 'border-b-2 border-[#3FDEE1]' : ''}`} 
+                      onClick={() => setActiveComponent('media')}
+                    >
+                      Image & video
+                    </button>
+                    <button 
+                      className={`text-zinc-400 hover:text-white ${activeComponent === 'link' ? 'border-b-2 border-[#3FDEE1]' : ''}`} 
+                      onClick={() => setActiveComponent('link')}
+                    >
+                      Link
                     </button>
                 </div>
+
+                {activeComponent === 'text' && <PostTextForm />}
+                {activeComponent === 'media' && <UploadMedia />}
+                {activeComponent === 'link' && <PostLinkForm />}
 
             </div>
         </div>
