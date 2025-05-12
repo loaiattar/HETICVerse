@@ -1,0 +1,64 @@
+{
+  "kind": "collectionType",
+  "collectionName": "calls",
+  "info": {
+    "singularName": "call",
+    "pluralName": "calls",
+    "displayName": "Video Call"
+  },
+  "options": {
+    "draftAndPublish": false
+  },
+  "attributes": {
+    "caller": {
+      "type": "relation",
+      "relation": "manyToOne",
+      "target": "plugin::users-permissions.user"
+    },
+    "callee": {
+      "type": "relation",
+      "relation": "manyToOne",
+      "target": "plugin::users-permissions.user"
+    },
+    "conversation": {
+      "type": "relation",
+      "relation": "manyToOne",
+      "target": "api::chat.conversation"
+    },
+    "status": {
+      "type": "enumeration",
+      "enum": [
+        "pending",
+        "ringing",
+        "active",
+        "ended",
+        "declined",
+        "missed",
+        "cancelled"
+      ],
+      "default": "pending"
+    },
+    "type": {
+      "type": "enumeration",
+      "enum": ["audio", "video"],
+      "default": "video"
+    },
+    "startedAt": {
+      "type": "datetime"
+    },
+    "endedAt": {
+      "type": "datetime"
+    },
+    "duration": {
+      "type": "integer",
+      "min": 0
+    },
+    "roomId": {
+      "type": "string",
+      "unique": true
+    },
+    "signalData": {
+      "type": "json"
+    }
+  }
+}
