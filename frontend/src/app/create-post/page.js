@@ -21,9 +21,9 @@ export default function Home() {
     <div className="flex min-h-screen bg-[#121212] text-white">
       {/* Sidebar */}
       <div className="w-64 px-4 py-0 border-r border-[#333D42] flex-shrink-0 ">
-        <div className="flex justify-center items-center p-4">
+        <a href="home" className="flex justify-center items-center p-4">
           <h1 className="text-2xl font-bold" style={{ fontFamily: 'Baloo Da 2' }}><span className="text-[#3FDEE1]">HETIC</span>V.</h1>
-        </div>
+        </a>
         <nav className="mt-2">
           <div>
             <a 
