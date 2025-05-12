@@ -1,0 +1,38 @@
+# === Next.js build output ===
+.next/
+out/
+
+# === Node.js ===
+node_modules/
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+pnpm-debug.log*
+
+# === OS ===
+.DS_Store
+Thumbs.db
+
+# === Env / config ===
+.env*
+.vercel/
+.vscode/
+.idea/
+
+# === Log / coverage ===
+logs/
+*.log
+coverage/
+*.lcov
+
+# === Mac OS-specific ===
+.Trashes
+.AppleDouble
+.LSOverride
+
+# === Others ===
+*.swp
+*.swo
+
+# === Optional ===
+public/static/cache/
