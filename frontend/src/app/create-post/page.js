@@ -3,6 +3,7 @@
 import { useState } from 'react'
 import Communities from '../component/FollowedCommunities'
 import RecentCommunities from '../component/RecentCommunities'
+import SelectCommunityButton from '../component/SelectCommunityButton'
 import PostTextForm from '../component/TextPostForm'
 import UploadMedia from '../component/UploadMedia'
 import PostLinkForm from '../component/PostLinkForm'
@@ -128,39 +129,25 @@ export default function Home() {
 
         <div className='flex justify-center w-full'>
             <div className="flex flex-col items-start w-2xl text-white p-6">
-                <h1 className="text-2xl font-semibold mb-6">Create post</h1>
+                <h1 className="text-3xl font-semibold mb-6">Create post</h1>
 
-                <div className="mb-4">
-                    <button className="bg-zinc-800 text-white px-4 py-2 rounded-full flex items-center hover:bg-zinc-700 transition">
-                    <span>Select a community</span>
-                    <svg
-                        className="w-4 h-4 ml-2"
-                        fill="none"
-                        stroke="currentColor"
-                        strokeWidth="2"
-                        viewBox="0 0 24 24"
-                        xmlns="http://www.w3.org/2000/svg"
-                    >
-                        <path strokeLinecap="round" strokeLinejoin="round" d="M19 9l-7 7-7-7"></path>
-                    </svg>
-                    </button>
-                </div>
+                <SelectCommunityButton />
 
                 <div className="flex space-x-6 mb-6 pb-2">
                     <button 
-                      className={`text-white font-medium ${activeComponent === 'text' ? 'border-b-2 border-[#3FDEE1]' : ''}`} 
+                      className={`text-white font-medium ${activeComponent === 'text' ? 'border-b-2 border-[#3FDEE1]' : 'text-zinc-400'}`} 
                       onClick={() => setActiveComponent('text')}
                     >
                       Text
                     </button>
                     <button 
-                      className={`text-zinc-400 hover:text-white ${activeComponent === 'media' ? 'border-b-2 border-[#3FDEE1]' : ''}`} 
+                      className={`font-medium ${activeComponent === 'media' ? 'border-b-2 border-[#3FDEE1]' : 'text-zinc-400'}`} 
                       onClick={() => setActiveComponent('media')}
                     >
                       Image & video
                     </button>
                     <button 
-                      className={`text-zinc-400 hover:text-white ${activeComponent === 'link' ? 'border-b-2 border-[#3FDEE1]' : ''}`} 
+                      className={`font-medium ${activeComponent === 'link' ? 'border-b-2 border-[#3FDEE1]' : 'text-zinc-400'}`} 
                       onClick={() => setActiveComponent('link')}
                     >
                       Link

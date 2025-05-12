@@ -23,7 +23,6 @@ export default function PostLinkForm() {
         <div>
           <input
             id="content"
-            value={content1}
             placeholder="Link URL"
             className="mt-1 mb-6 block w-full border border-[#C7C7C7] rounded-xl py-4 px-5 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500"
           />
