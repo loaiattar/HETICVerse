@@ -1,4 +1,4 @@
-// File: C:\Users\iferh\OneDrive\Bureau\Hetic-VERSE\HETICVerse\frontend\src\app\page.js
+// File: /Users/nm.mp4/Desktop/HETICV/HETICVerse/frontend/src/app/page.js
 import * as entry from '../../../src/app/page.js'
 import type { ResolvingMetadata, ResolvingViewport } from 'next/dist/lib/metadata/types/metadata-interface.js'
 
