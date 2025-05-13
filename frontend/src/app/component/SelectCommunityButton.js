@@ -1,32 +1,66 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
+import axios from 'axios';
 
-export default function SelectCommunityButton() {
+export default function SelectCommunityButton({ onSelect, selectedCommunity }) {
   const [isOpen, setIsOpen] = useState(false);
-  const [selectedCommunity, setSelectedCommunity] = useState(null);
+  const [communities, setCommunities] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
 
-  const communities = [
-    { name: 'u/nm_mp4', members: 'Your profile' },
-    { name: 'r/667', members: '8,207 members' },
-    { name: 'r/announcements', members: '304,513,033 members' },
-    { name: 'r/Basketball', members: '1,655,169 members' },
-    { name: 'r/fantasybball', members: '961,832 members' },
-    { name: 'r/frenchrap', members: '78,078 members' },
-    { name: 'r/Futurology', members: '21,577,325 members' },
-    { name: 'r/MangaCollectors', members: '1,906,489 members' },
-    { name: 'r/mangadeals', members: '1,011,499 members' },
-    { name: 'r/nba', members: '16,359,100 members' },
-  ];
+  useEffect(() => {
+    const fetchCommunities = async () => {
+      try {
+        const token = localStorage.getItem('jwt');
+
+        if (!token) {
+          setError('Non authentifié. Veuillez vous connecter.');
+          setLoading(false);
+          return;
+        }
+
+        const response = await axios.get('http://127.0.0.1:1337/api/communities?populate=*', {
+          headers: {
+            Authorization: `Bearer ${token}`,
+            'Content-Type': 'application/json',
+          }
+        });
+
+        if (response.data && response.data.data) {
+          const formattedCommunities = response.data.data.map(community => ({
+            id: community.id,
+            name: community.name || 'Sans nom',
+            members: `${community.memberCount || 0} membres`,
+            documentId: community.documentId
+          }));
+          setCommunities(formattedCommunities);
+        }
+      } catch (err) {
+        if (err.response?.status === 403) {
+          setError('Accès refusé. Veuillez vous connecter ou vérifier les permissions.');
+        } else if (err.response) {
+          setError(`Erreur ${err.response.status}: ${err.response.data.error?.message || 'Erreur lors du chargement des communautés'}`);
+        } else {
+          setError('Erreur de connexion au serveur');
+        }
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchCommunities();
+  }, []);
 
   const handleCommunitySelect = (community) => {
-    setSelectedCommunity(community);
+    onSelect(community);
     setIsOpen(false);
   };
 
   return (
     <div className="mb-4 relative">
       <button 
-        className="flex justify-between w-xs bg-[#2B3236] text-white px-4 py-2 rounded-full flex items-center hover:bg-[#333D42] transition"
+        className="flex justify-between w-full bg-[#2B3236] text-white px-4 py-2 rounded-full flex items-center hover:bg-[#333D42] transition"
         onClick={() => setIsOpen(!isOpen)}
+        type="button"
       >
         <span>{selectedCommunity ? selectedCommunity.name : 'Select a community'}</span>
         <svg
@@ -42,17 +76,37 @@ export default function SelectCommunityButton() {
       </button>
 
       {isOpen && (
-        <div className="absolute z-10 bg-[#2B3236] rounded-md shadow-lg mt-2 w-full">
-          {communities.map((community, index) => (
-            <div 
-              key={index} 
-              className="flex flex-col px-4 py-2 text-white text-sm hover:bg-[#333D42] cursor-pointer"
-              onClick={() => handleCommunitySelect(community)}
-            >
-              <span>{community.name}</span>
-              <span className="text-gray-400 text-sm">{community.members}</span>
+        <div className="absolute z-10 bg-[#2B3236] rounded-md shadow-lg mt-2 w-full max-h-60 overflow-y-auto">
+          {loading ? (
+            <div className="px-4 py-2 text-white text-sm">Chargement...</div>
+          ) : error ? (
+            <div className="px-4 py-2 text-red-400 text-sm">
+              {error}
+              {error.includes('403') && (
+                <div className="mt-2 text-xs">
+                  <p>Pour résoudre ce problème :</p>
+                  <ol className="list-decimal list-inside mt-1">
+                    <li>Vérifiez que vous êtes bien connecté</li>
+                    <li>Vérifiez les permissions dans Strapi pour le rôle "Authenticated"</li>
+                    <li>Si le problème persiste, essayez de vous déconnecter et reconnecter</li>
+                  </ol>
+                </div>
+              )}
             </div>
-          ))}
+          ) : communities.length === 0 ? (
+            <div className="px-4 py-2 text-white text-sm">Aucune communauté disponible</div>
+          ) : (
+            communities.map((community) => (
+              <div 
+                key={community.id} 
+                className="flex flex-col px-4 py-2 text-white text-sm hover:bg-[#333D42] cursor-pointer"
+                onClick={() => handleCommunitySelect(community)}
+              >
+                <span>{community.name}</span>
+                <span className="text-gray-400 text-sm">{community.members}</span>
+              </div>
+            ))
+          )}
         </div>
       )}
     </div>

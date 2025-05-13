@@ -2,8 +2,10 @@
 
 import axios from 'axios';
 import { useState } from 'react';
+import { useRouter } from 'next/navigation';
 
 export default function LogInPage() {
+  const router = useRouter();
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [error, setError] = useState('');
@@ -23,6 +25,12 @@ export default function LogInPage() {
       console.log('User profile', response.data.user);
       console.log('User token', response.data.jwt);
       setSuccess('Connexion réussie !');
+      localStorage.setItem('jwt', response.data.jwt);
+      
+      // Redirection vers la page home après 1 seconde
+      setTimeout(() => {
+        router.push('/home');
+      }, 1000);
     } catch (err) {
       setError('Email ou mot de passe incorrect.');
       console.error(err.response || err);
@@ -72,7 +80,7 @@ export default function LogInPage() {
 
         <p className="text-sm text-center text-white mt-6">
           Pas encore de compte ?{" "}
-          <a href="/register" className="text-[#3FDEE1] hover:underline">
+          <a href="/" className="text-[#3FDEE1] hover:underline">
             S&apos;inscrire
           </a>
         </p>

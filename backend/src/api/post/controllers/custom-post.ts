@@ -14,13 +14,162 @@ interface PostQueryParams {
   type?: string;
 }
 
+interface User {
+  id: number;
+  username: string;
+  avatar?: string;
+}
+
+interface Community {
+  id: number;
+  name: string;
+  slug: string;
+  image?: string;
+  privacy: string;
+}
+
+interface Image {
+  id: number;
+  url: string;
+}
+
+interface Post {
+  id: number;
+  title: string;
+  content: any;
+  type: string;
+  URL: string | null;
+  vote: number;
+  createdAt: string;
+  updatedAt: string;
+  user?: User;
+  community?: Community;
+  image?: Image;
+}
+
+interface Vote {
+  id: number;
+  value: number;
+}
+
+interface Bookmark {
+  id: number;
+  date: string;
+}
+
+interface CommunityMember {
+  id: number;
+  community: Community;
+  status: string;
+}
+
+interface CompletePost {
+  id: number;
+  title: string;
+  content: any;
+  type: string;
+  URL: string | null;
+  vote: number;
+  createdAt: string;
+  user?: {
+    id: number;
+    username: string;
+  };
+  community?: {
+    id: number;
+    name: string;
+    slug: string;
+  };
+  image?: {
+    id: number;
+    url: string;
+  };
+}
+
+type StrapiEntity = {
+  id: number;
+  attributes: Record<string, any>;
+};
+
+type StrapiPost = StrapiEntity & {
+  attributes: {
+    title: string;
+    content: any;
+    type: string;
+    URL: string | null;
+    vote: number;
+    createdAt: string;
+    updatedAt: string;
+    user?: {
+      data: StrapiEntity & {
+        attributes: {
+          username: string;
+          avatar?: string;
+        }
+      }
+    };
+    community?: {
+      data: StrapiEntity & {
+        attributes: {
+          name: string;
+          slug: string;
+          image?: string;
+          privacy: string;
+        }
+      }
+    };
+    image?: {
+      data: StrapiEntity & {
+        attributes: {
+          url: string;
+        }
+      }
+    };
+  }
+};
+
+type StrapiVote = StrapiEntity & {
+  attributes: {
+    value: number;
+  }
+};
+
+type StrapiBookmark = StrapiEntity & {
+  attributes: {
+    date: string;
+  }
+};
+
+type StrapiCommunityMember = StrapiEntity & {
+  attributes: {
+    community: {
+      data: StrapiEntity & {
+        attributes: {
+          name: string;
+          slug: string;
+          privacy: string;
+        }
+      }
+    };
+    status: string;
+  };
+  community?: {
+    id: number;
+    name: string;
+    slug: string;
+    privacy: string;
+  };
+};
+
 export default {
   /**
    * Create a new post
    */
   createPost: async (ctx) => {
-    const { title, content, type, communityId, URL, image } = ctx.request.body;
+    const { title, content, type, communityId, URL, image } = ctx.request.body.data;
     const { user } = ctx.state;
+
+    console.log(ctx.request.body);
     
     if (!user) {
       return ctx.unauthorized('You must be logged in to create a post');
@@ -38,8 +187,7 @@ export default {
       
       // Check if community exists
       const community = await strapi.db.query('api::community.community').findOne({
-        where: { id: communityId },
-        populate: '*'
+        where: { id: communityId }
       });
       
       if (!community) {
@@ -47,16 +195,30 @@ export default {
       }
       
       // Check if user is a member of the community
-      const isMember = await strapi.db.query('api::community-member.community-member').findOne({
-        where: {
-          $and: [
-            { 'user.id': user.id },
-            { 'community.id': communityId },
-            { status: 'active' }
-          ]
+      // const isMember = await strapi.documents('api::community-member.community-member').findMany({
+      //   where: {
+      //     $and: [
+      //       { 'user.id': user.id },
+      //       { 'community.id': communityId },
+      //       { status: 'active' }
+      //     ]
+      //   }
+      // });
+
+      const isMember = await strapi.documents('api::community-member.community-member').findMany({
+        filters: {
+          users_permissions_user: {
+            id: user.id
+          },
+          community: {
+            id: communityId
+          },
+          statu: 'active'
         }
       });
-      
+
+      console.log(isMember);
+
       if (!isMember && community.privacy !== 'public') {
         return ctx.forbidden('You must be a member of this community to post');
       }
@@ -81,26 +243,21 @@ export default {
       }
       
       // Create the post
-      const post = await strapi.db.query('api::post.post').create({
+      const post = await strapi.entityService.create('api::post.post', {
         data: {
           title,
-          content: content || null,
+          content: [{
+            type: 'paragraph',
+            children: [{
+              type: 'text',
+              text: content || ''
+            }]
+          }],
           type,
           URL: URL || null,
-          vote: 0
-        }
-      });
-      
-      // Connect relations
-      await strapi.db.query('api::post.post').update({
-        where: { id: post.id },
-        data: {
-          user: {
-            connect: [{ id: user.id }]
-          },
-          community: {
-            connect: [{ id: communityId }]
-          }
+          vote: 0,
+          user: user.id,
+          community: communityId
         }
       });
       
@@ -118,25 +275,28 @@ export default {
         });
       }
       
-      // Fetch the complete post with all relations
-      const completePost = await strapi.db.query('api::post.post').findOne({
-        where: { id: post.id },
-        populate: '*'
-      });
+      // Fetch the complete post sans populate
+      const completePost = await strapi.entityService.findOne('api::post.post', post.id, {
+        populate: ['user', 'community', 'image']
+      }) as CompletePost;
       
-      // Create an initial upvote from the poster
-      await strapi.db.query('api::vote.vote').create({
-        data: {
-          value: 1,
-          date: new Date(),
-          user: {
-            connect: [{ id: user.id }]
-          },
-          post: {
-            connect: [{ id: post.id }]
-          }
-        }
-      });
+      if (!completePost) {
+        return ctx.badRequest('Failed to create post');
+      }
+      
+      // TODO: Create an initial upvote from the poster
+      // await strapi.db.query('api::vote.vote').create({
+      //   data: {
+      //     value: 1,
+      //     date: new Date(),
+      //     user: {
+      //       connect: [{ id: user.id }]
+      //     },
+      //     post: {
+      //       connect: [{ id: post.id }]
+      //     }
+      //   }
+      // });
       
       // Notify community moderators about new post (optional)
       if (community.notifyModerators) {
@@ -180,15 +340,15 @@ export default {
           URL: completePost.URL,
           vote: completePost.vote,
           createdAt: completePost.createdAt,
-          user: {
+          user: completePost.user ? {
             id: completePost.user.id,
             username: completePost.user.username
-          },
-          community: {
+          } : null,
+          community: completePost.community ? {
             id: completePost.community.id,
             name: completePost.community.name,
             slug: completePost.community.slug
-          },
+          } : null,
           image: completePost.image ? {
             id: completePost.image.id,
             url: completePost.image.url
@@ -229,8 +389,8 @@ export default {
       const isModerator = await strapi.db.query('api::community-member.community-member').findOne({
         where: {
           $and: [
-            { 'user.id': user.id },
-            { 'community.id': post.community.id },
+            { user_id: user.id },
+            { community_id: post.community.id },
             { role: { $in: ['moderator', 'admin'] } }
           ]
         }
@@ -330,8 +490,8 @@ export default {
       const isModerator = await strapi.db.query('api::community-member.community-member').findOne({
         where: {
           $and: [
-            { 'user.id': user.id },
-            { 'community.id': post.community.id },
+            { user_id: user.id },
+            { community_id: post.community.id },
             { role: { $in: ['moderator', 'admin'] } }
           ]
         }
@@ -533,15 +693,15 @@ export default {
         // Check if filter is by slug or ID
         if (isNaN(Number(community))) {
           // Filter by slug
-          const communityEntity = await strapi.db.query('api::community.community').findOne({
-            where: { slug: community }
+          const communityEntity = await strapi.entityService.findMany('api::community.community', {
+            filters: { slug: community }
           });
           
-          if (communityEntity) {
-            filters['community.id'] = communityEntity.id;
+          if (communityEntity && communityEntity.length > 0) {
+            filters.community = communityEntity[0].id;
             
             // Check if community is private and user is not a member
-            if (communityEntity.privacy === 'private') {
+            if (communityEntity[0].privacy === 'private') {
               // If user is not logged in
               if (!user) {
                 return {
@@ -555,17 +715,23 @@ export default {
               }
               
               // Check if user is a member
-              const isMember = await strapi.db.query('api::community-member.community-member').findOne({
-                where: {
-                  $and: [
-                    { 'user.id': user.id },
-                    { 'community.id': communityEntity.id },
-                    { status: 'active' }
-                  ]
+              const isMember = await strapi.entityService.findMany('api::community-member.community-member', {
+                filters: {
+                  users_permissions_user: {
+                    id: {
+                      $eq: user.id
+                    }
+                  },
+                  community: {
+                    id: {
+                      $eq: communityEntity[0].id
+                    }
+                  },
+                  status: 'active'
                 }
-              });
+              }) as unknown as StrapiCommunityMember[];
               
-              if (!isMember) {
+              if (!isMember || isMember.length === 0) {
                 return {
                   data: [],
                   meta: {
@@ -589,12 +755,10 @@ export default {
           }
         } else {
           // Filter by ID
-          filters['community.id'] = community;
+          filters.community = community;
           
           // Check if community is private
-          const communityEntity = await strapi.db.query('api::community.community').findOne({
-            where: { id: community }
-          });
+          const communityEntity = await strapi.entityService.findOne('api::community.community', community);
           
           if (communityEntity && communityEntity.privacy === 'private') {
             // If user is not logged in
@@ -610,17 +774,23 @@ export default {
             }
             
             // Check if user is a member
-            const isMember = await strapi.db.query('api::community-member.community-member').findOne({
-              where: {
-                $and: [
-                  { 'user.id': user.id },
-                  { 'community.id': communityEntity.id },
-                  { status: 'active' }
-                ]
+            const isMember = await strapi.entityService.findMany('api::community-member.community-member', {
+              filters: {
+                users_permissions_user: {
+                  id: {
+                    $eq: user.id
+                  }
+                },
+                community: {
+                  id: {
+                    $eq: communityEntity.id
+                  }
+                },
+                status: 'active'
               }
-            });
+            }) as unknown as StrapiCommunityMember[];
             
-            if (!isMember) {
+            if (!isMember || isMember.length === 0) {
               return {
                 data: [],
                 meta: {
@@ -636,16 +806,18 @@ export default {
         // If no community filter, exclude private communities that user is not a member of
         if (user) {
           // Get communities user is a member of
-          const memberships = await strapi.db.query('api::community-member.community-member').findMany({
-            where: { 'user.id': user.id },
-            populate: { community: true }
-          });
+          const memberships = await strapi.entityService.findMany('api::community-member.community-member', {
+            filters: { users_permissions_user: user.id },
+            populate: ['community']
+          }) as unknown as StrapiCommunityMember[];
           
-          const memberCommunityIds = memberships.map(m => m.community.id);
+          const memberCommunityIds = memberships
+            .map(m => m.community?.id)
+            .filter((id): id is number => id !== undefined);
           
           // Get public and restricted communities
-          const publicCommunities = await strapi.db.query('api::community.community').findMany({
-            where: { privacy: { $ne: 'private' } }
+          const publicCommunities = await strapi.entityService.findMany('api::community.community', {
+            filters: { privacy: { $ne: 'private' } }
           });
           
           const publicCommunityIds = publicCommunities.map(c => c.id);
@@ -653,21 +825,21 @@ export default {
           // Combine IDs of communities user can see
           const allowedCommunityIds = [...new Set([...memberCommunityIds, ...publicCommunityIds])];
           
-          filters['community.id'] = { $in: allowedCommunityIds };
+          filters.community = { $in: allowedCommunityIds };
         } else {
           // For non-logged in users, only show posts from public and restricted communities
-          const publicCommunities = await strapi.db.query('api::community.community').findMany({
-            where: { privacy: { $ne: 'private' } }
+          const publicCommunities = await strapi.entityService.findMany('api::community.community', {
+            filters: { privacy: { $ne: 'private' } }
           });
           
           const publicCommunityIds = publicCommunities.map(c => c.id);
-          filters['community.id'] = { $in: publicCommunityIds };
+          filters.community = { $in: publicCommunityIds };
         }
       }
       
       // Add user filter
       if (userId) {
-        filters['user.id'] = userId;
+        filters.user = userId;
       }
       
       // Add type filter
@@ -696,8 +868,6 @@ export default {
           orderBy = { vote: 'desc' };
           break;
         case 'controversial':
-          // For controversial, we might need a more complex approach
-          // For now, let's just use votes as a proxy
           orderBy = { vote: 'asc' };
           break;
         default:
@@ -705,85 +875,97 @@ export default {
       }
       
       // Find posts
-      const posts = await strapi.db.query('api::post.post').findMany({
-        where: filters,
-        orderBy,
-        populate: '*',
+      const posts = await strapi.entityService.findMany('api::post.post', {
+        filters,
+        sort: orderBy,
+        populate: ['user', 'community', 'image'],
         limit: limitNum,
         offset: (pageNum - 1) * limitNum
-      });
+      }) as unknown as StrapiPost[];
       
       // Count total posts matching filters
-      const count = await strapi.db.query('api::post.post').count({
-        where: filters
+      const count = await strapi.entityService.count('api::post.post', {
+        filters
       });
       
       // Get comment counts, user votes, and bookmarks for posts
       const postsWithDetails = await Promise.all(
         posts.map(async (post) => {
           // Get comment count
-          const commentCount = await strapi.db.query('api::comment.comment').count({
-            where: { 'post.id': post.id }
+          const commentCount = await strapi.entityService.count('api::comment.comment', {
+            filters: {
+              post: {
+                id: post.id
+              }
+            }
           });
           
           // Check if user has voted on this post
           let userVote = null;
-          if (user) {
-            const vote = await strapi.db.query('api::vote.vote').findOne({
-              where: {
-                $and: [
-                  { 'user.id': user.id },
-                  { 'post.id': post.id }
-                ]
+          const vote = await strapi.entityService.findMany('api::vote.vote' as any, {
+            filters: {
+              users_permissions_user: {
+                id: {
+                  $eq: user.id
+                }
+              },
+              post: {
+                id: {
+                  $eq: post.id
+                }
               }
-            });
-            
-            if (vote) {
-              userVote = vote.value;
             }
+          }) as unknown as StrapiVote[];
+          
+          if (vote && vote.length > 0) {
+            userVote = vote[0].attributes.value;
           }
           
           // Check if user has bookmarked this post
           let isBookmarked = false;
-          if (user) {
-            const bookmark = await strapi.db.query('api::bookmark.bookmark').findOne({
-              where: {
-                $and: [
-                  { 'user.id': user.id },
-                  { 'post.id': post.id }
-                ]
+          const bookmark = await strapi.entityService.findMany('api::bookmark.bookmark', {
+            filters: {
+              users_permissions_user: {
+                id: {
+                  $eq: user.id
+                }
+              },
+              post: {
+                id: {
+                  $eq: post.id
+                }
               }
-            });
-            
-            isBookmarked = !!bookmark;
-          }
+            }
+          }) as unknown as StrapiBookmark[];
+          
+          isBookmarked = bookmark && bookmark.length > 0;
           
           return {
             id: post.id,
-            title: post.title,
-            content: post.content,
-            type: post.type,
-            URL: post.URL,
-            vote: post.vote,
-            createdAt: post.createdAt,
-            updatedAt: post.updatedAt,
+            title: post.attributes.title,
+            content: post.attributes.content,
+            type: post.attributes.type,
+            URL: post.attributes.URL,
+            vote: post.attributes.vote,
+            createdAt: post.attributes.createdAt,
+            updatedAt: post.attributes.updatedAt,
             commentCount,
-            userVote,
+            userVote: userVote,
             isBookmarked,
-            user: {
-              id: post.user.id,
-              username: post.user.username,
-              avatar: post.user.avatar
-            },
-            community: {
-              id: post.community.id,
-              name: post.community.name,
-              slug: post.community.slug,
-              image: post.community.image
-            },
-            image: post.image ? {
-              id: post.image.id,
-              url: post.image.url
+            user: post.attributes.user?.data ? {
+              id: post.attributes.user.data.id,
+              username: post.attributes.user.data.attributes.username,
+              avatar: post.attributes.user.data.attributes.avatar
+            } : null,
+            community: post.attributes.community?.data ? {
+              id: post.attributes.community.data.id,
+              name: post.attributes.community.data.attributes.name,
+              slug: post.attributes.community.data.attributes.slug,
+              image: post.attributes.community.data.attributes.image
+            } : null,
+            image: post.attributes.image?.data ? {
+              id: post.attributes.image.data.id,
+              url: post.attributes.image.data.attributes.url
             } : null
           };
         })

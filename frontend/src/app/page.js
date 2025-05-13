@@ -2,8 +2,10 @@
 
 import axios from 'axios';
 import { useState } from 'react';
+import { useRouter } from 'next/navigation';
 
 export default function RegisterPage() {
+  const router = useRouter();
   const [email, setEmail] = useState('');
   const [username, setUsername] = useState('');
   const [password, setPassword] = useState('');
@@ -31,7 +33,10 @@ export default function RegisterPage() {
       console.log('User profile:', response.data.user);
       console.log('User token:', response.data.jwt);
 
-      // Optionnel : rediriger ou stocker le token
+      // Redirection vers la page home après 1 seconde
+      setTimeout(() => {
+        router.push('/home');
+      }, 1000);
     } catch (err) {
       setError(err.response?.data?.error?.message || "Erreur lors de l'inscription.");
     }

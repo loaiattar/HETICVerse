@@ -1,46 +1,93 @@
 'use client'
 
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
+import axios from 'axios'
+import Link from 'next/link'
+import { useRouter } from 'next/navigation'
 import Communities from '../component/FollowedCommunities'
 import RecentCommunities from '../component/RecentCommunities'
 import PostCard from '../component/PostCard'
+import PostTextForm from '../component/TextPostForm'
+import UserMenu from '../component/UserMenu'
 
 export default function Home() {
+  const router = useRouter()
   const [selectedButton, setSelectedButton] = useState('home')
+  const [posts, setPosts] = useState([])
+  const [loading, setLoading] = useState(true)
+
+  const fetchPosts = async () => {
+    setLoading(true)
+    try {
+      let url = 'http://localhost:1337/api/posts?populate[community]=true&populate[user]=true&populate[image]=true'
+      
+      // Ajouter des paramètres de tri en fonction du bouton sélectionné
+      switch(selectedButton) {
+        case 'tendancy':
+          url += '&sort[0]=vote:desc' // Trier par nombre de votes décroissant
+          break
+        case 'all':
+          url += '&sort[0]=createdAt:desc' // Trier par date de création
+          break
+        default: // home
+          url += '&sort[0]=createdAt:desc' // Par défaut, trier par date de création
+      }
+      
+      const response = await axios.get(url)
+      setPosts(response.data.data)
+    } catch (err) {
+      console.error('Error fetching posts:', err)
+      setPosts([])
+    } finally {
+      setLoading(false)
+    }
+  }
+
+  useEffect(() => {
+    fetchPosts()
+    // Rafraîchir les posts toutes les 30 secondes
+    const interval = setInterval(fetchPosts, 30000)
+    return () => clearInterval(interval)
+  }, [selectedButton]) // Recharger les posts quand le bouton change
 
   const handleButtonClick = (button) => {
     setSelectedButton(button)
+    if (button === 'home') {
+      router.push('/home')
+    } else if (button === 'tendancy') {
+      router.push('/home?view=tendancy')
+    } else if (button === 'all') {
+      router.push('/home?view=all')
+    }
   }
 
   return (
     <div className="flex min-h-screen bg-[#121212] text-white">
       {/* Sidebar */}
       <div className="w-64 px-4 py-0 border-r border-[#333D42] flex-shrink-0 ">
-        <a href=""className="flex justify-center items-center p-4">
+        <Link href="/home" className="flex justify-center items-center p-4">
           <h1 className="text-2xl font-bold" style={{ fontFamily: 'Baloo Da 2' }}><span className="text-[#3FDEE1]">HETIC</span>V.</h1>
-        </a>
+        </Link>
         <nav className="mt-2">
           <div>
-            <a 
-              href="#" 
+            <Link 
+              href="/home" 
               className={`flex items-center gap-3 p-3 rounded-md ${selectedButton === 'home' ? 'bg-[#2B3236]' : 'hover:bg-[#181C1F]'}`} 
               onClick={() => handleButtonClick('home')}
             >
               {selectedButton === 'home' ? (
-              <svg xmlns="http://www.w3.org/2000/svg" fill='white' viewBox="0 0 48 48" width="24px" height="24px"><path d="M39.5,43h-9c-1.381,0-2.5-1.119-2.5-2.5v-9c0-1.105-0.895-2-2-2h-4c-1.105,0-2,0.895-2,2v9c0,1.381-1.119,2.5-2.5,2.5h-9	C7.119,43,6,41.881,6,40.5V21.413c0-2.299,1.054-4.471,2.859-5.893L23.071,4.321c0.545-0.428,1.313-0.428,1.857,0L39.142,15.52	C40.947,16.942,42,19.113,42,21.411V40.5C42,41.881,40.881,43,39.5,43z"/></svg>
-
+                <svg xmlns="http://www.w3.org/2000/svg" fill='white' viewBox="0 0 48 48" width="24px" height="24px"><path d="M39.5,43h-9c-1.381,0-2.5-1.119-2.5-2.5v-9c0-1.105-0.895-2-2-2h-4c-1.105,0-2,0.895-2,2v9c0,1.381-1.119,2.5-2.5,2.5h-9	C7.119,43,6,41.881,6,40.5V21.413c0-2.299,1.054-4.471,2.859-5.893L23.071,4.321c0.545-0.428,1.313-0.428,1.857,0L39.142,15.52	C40.947,16.942,42,19.113,42,21.411V40.5C42,41.881,40.881,43,39.5,43z"/></svg>
               ) : (
-                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                <svg width="24" height="24" viewBox="0 0 24 24" fill="white" xmlns="http://www.w3.org/2000/svg">
                   <path d="M11.9756 1.99999C11.8157 2.00545 11.6617 2.06191 11.5361 2.16113L4.42968 7.75976C3.52773 8.47057 3 9.55675 3 10.7051V20.25C3 20.9318 3.5682 21.5 4.25 21.5H9.25C9.93179 21.5 10.5 20.9318 10.5 20.25V15.25C10.5 15.1025 10.6025 15 10.75 15H13.25C13.3975 15 13.5 15.1025 13.5 15.25V20.25C13.5 20.9318 14.0682 21.5 14.75 21.5H19.75C20.4318 21.5 21 20.9318 21 20.25V10.7051C21 9.55675 20.4722 8.47058 19.5703 7.75976L12.4639 2.16113C12.3252 2.05157 12.1522 1.9945 11.9756 1.99999ZM12 3.70507L18.6426 8.93847C19.1846 9.36565 19.5 10.0154 19.5 10.7051V20H15V15.25C15 14.2925 14.2075 13.5 13.25 13.5H10.75C9.79252 13.5 9 14.2925 9 15.25V20H4.5V10.7051C4.5 10.0154 4.81537 9.36565 5.35742 8.93847L12 3.70507Z" fill="white"/>
                 </svg>
-
               )}
               <span className="font-bold">Home</span>
-            </a>
+            </Link>
           </div>
           <div>
-            <a 
-              href="#" 
+            <Link 
+              href="/home?view=tendancy" 
               className={`flex items-center gap-3 p-3 mt-1 rounded-md ${selectedButton === 'tendancy' ? 'bg-[#2B3236]' : 'hover:bg-[#181C1F]'}`} 
               onClick={() => handleButtonClick('tendancy')}
             >
@@ -54,11 +101,11 @@ export default function Home() {
                 </svg>
               )}
               <span className="font-bold">Tendancy</span>
-            </a>
+            </Link>
           </div>
           <div>
-            <a 
-              href="#" 
+            <Link 
+              href="/home?view=all" 
               className={`flex items-center gap-3 p-3 mt-1 rounded-md ${selectedButton === 'all' ? 'bg-[#2B3236]' : 'hover:bg-[#181C1F]'}`} 
               onClick={() => handleButtonClick('all')}
             >
@@ -72,7 +119,7 @@ export default function Home() {
                 </svg>
               )}
               <span className="font-bold">All</span>
-            </a>
+            </Link>
           </div>
         </nav>
 
@@ -104,21 +151,33 @@ export default function Home() {
           </div>
           
           <div className="flex items-center space-x-4">
-            <a href="create-post" className="flex flex-row justify-center items-center gap-1 px-2 py-2 rounded-full text-sm font-medium hover:bg-[#333D42]">
+            <Link href="/create-post" className="flex flex-row justify-center items-center gap-1 px-2 py-2 rounded-full text-sm font-medium hover:bg-[#333D42]">
               <svg xmlns="http://www.w3.org/2000/svg" height="24px" viewBox="0 -960 960 960" width="24px" fill="#FFFFFF"><path d="M440-440H200v-80h240v-240h80v240h240v80H520v240h-80v-240Z"/></svg>
               Create
-            </a>
+            </Link>
             <button className="p-1">
               <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 17h5l-1.405-1.405A2.032 2.032 0 0118 14.158V11a6.002 6.002 0 00-4-5.659V5a2 2 0 10-4 0v.341C7.67 6.165 6 8.388 6 11v3.159c0 .538-.214 1.055-.595 1.436L4 17h5m6 0v1a3 3 0 11-6 0v-1m6 0H9" />
               </svg>
             </button>
             <div className="w-8 h-8 bg-gray-200 rounded-full"></div>
+            <UserMenu />
           </div>
         </header>
         
-        <div className="flex flex-column Justify-center items-center">
-          <PostCard/>
+        <div className="flex flex-col items-center w-full">
+          {/* Liste des posts */}
+          {loading ? (
+            <div className="text-gray-400 mt-8">Chargement des posts...</div>
+          ) : posts.length === 0 ? (
+            <div className="text-gray-400 mt-8">Aucun post pour le moment.</div>
+          ) : (
+            posts.map(post => (
+              <div key={post.id} className="w-full max-w-2xl mb-6">
+                <PostCard postId={post.id} />
+              </div>
+            ))
+          )}
         </div>
         
       </div>

@@ -33,12 +33,6 @@
         "audios"
       ]
     },
-    "post": {
-      "type": "relation",
-      "relation": "oneToOne",
-      "target": "api::post.post",
-      "mappedBy": "community"
-    },
     "users_permissions_users": {
       "type": "relation",
       "relation": "oneToMany",
@@ -47,7 +41,8 @@
     "community_members": {
       "type": "relation",
       "relation": "oneToMany",
-      "target": "api::community-member.community-member"
+      "target": "api::community-member.community-member",
+      "mappedBy": "community"
     },
     "community_invitations": {
       "type": "relation",
@@ -114,6 +109,12 @@
       "type": "relation",
       "relation": "oneToOne",
       "target": "api::video-call.video-call",
+      "mappedBy": "community"
+    },
+    "posts": {
+      "type": "relation",
+      "relation": "oneToMany",
+      "target": "api::post.post",
       "mappedBy": "community"
     }
   }

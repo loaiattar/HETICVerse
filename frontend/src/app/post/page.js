@@ -1,48 +1,119 @@
 'use client'
 
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
+import Link from 'next/link'
+import { useRouter } from 'next/navigation'
 import Communities from '../component/FollowedCommunities'
 import RecentCommunities from '../component/RecentCommunities'
 import PostCard from '../component/PostCard'
 import PostComment from '../component/PostComment'
+import UserMenu from '../component/UserMenu'
 
 export default function Home() {
+  const router = useRouter()
   const [selectedButton, setSelectedButton] = useState('home')
+  const [postContent, setPostContent] = useState('')
+  const [postTitle, setPostTitle] = useState('')
+  const [selectedCommunity, setSelectedCommunity] = useState('')
+  const [communities, setCommunities] = useState([])
+  const [isSubmitting, setIsSubmitting] = useState(false)
+
+  // Charger les communautés au montage du composant
+  useEffect(() => {
+    const fetchCommunities = async () => {
+      try {
+        const response = await fetch('http://localhost:1337/api/communities')
+        if (!response.ok) {
+          throw new Error('Erreur lors du chargement des communautés')
+        }
+        const data = await response.json()
+        setCommunities(data.data)
+      } catch (error) {
+        console.error('Erreur:', error)
+      }
+    }
+
+    fetchCommunities()
+  }, [])
 
   const handleButtonClick = (button) => {
     setSelectedButton(button)
+    if (button === 'home') {
+      router.push('/home')
+    } else if (button === 'tendancy') {
+      router.push('/home?view=tendancy')
+    } else if (button === 'all') {
+      router.push('/home?view=all')
+    }
+  }
+
+  const handleSubmit = async (e) => {
+    e.preventDefault()
+    setIsSubmitting(true)
+
+    try {
+      const response = await fetch('http://localhost:1337/api/posts', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          data: {
+            title: postTitle,
+            content: postContent,
+            publishedAt: new Date().toISOString(),
+            community: selectedCommunity
+          }
+        }),
+      })
+
+      if (!response.ok) {
+        const errorData = await response.json()
+        console.log('Error response:', errorData)
+        throw new Error(errorData.error?.message || 'Erreur lors de la création du post')
+      }
+
+      const data = await response.json()
+      console.log('Post créé avec succès:', data)
+      setPostContent('')
+      setPostTitle('')
+      setSelectedCommunity('')
+    } catch (error) {
+      console.error('Erreur complète:', error)
+      alert(error.message || 'Une erreur est survenue lors de la création du post')
+    } finally {
+      setIsSubmitting(false)
+    }
   }
 
   return (
     <div className="flex min-h-screen bg-[#121212] text-white">
       {/* Sidebar */}
       <div className="w-64 px-4 py-0 border-r border-[#333D42] flex-shrink-0 ">
-        <a href="home" className="flex justify-center items-center p-4">
+        <Link href="/home" className="flex justify-center items-center p-4">
           <h1 className="text-2xl font-bold" style={{ fontFamily: 'Baloo Da 2' }}><span className="text-[#3FDEE1]">HETIC</span>V.</h1>
-        </a>
+        </Link>
         <nav className="mt-2">
           <div>
-            <a 
-              href="#" 
+            <Link 
+              href="/home" 
               className={`flex items-center gap-3 p-3 rounded-md ${selectedButton === 'home' ? 'bg-[#2B3236]' : 'hover:bg-[#181C1F]'}`} 
               onClick={() => handleButtonClick('home')}
             >
               {selectedButton === 'home' ? (
-              <svg xmlns="http://www.w3.org/2000/svg" fill='white' viewBox="0 0 48 48" width="24px" height="24px"><path d="M39.5,43h-9c-1.381,0-2.5-1.119-2.5-2.5v-9c0-1.105-0.895-2-2-2h-4c-1.105,0-2,0.895-2,2v9c0,1.381-1.119,2.5-2.5,2.5h-9	C7.119,43,6,41.881,6,40.5V21.413c0-2.299,1.054-4.471,2.859-5.893L23.071,4.321c0.545-0.428,1.313-0.428,1.857,0L39.142,15.52	C40.947,16.942,42,19.113,42,21.411V40.5C42,41.881,40.881,43,39.5,43z"/></svg>
-
+                <svg xmlns="http://www.w3.org/2000/svg" fill='white' viewBox="0 0 48 48" width="24px" height="24px"><path d="M39.5,43h-9c-1.381,0-2.5-1.119-2.5-2.5v-9c0-1.105-0.895-2-2-2h-4c-1.105,0-2,0.895-2,2v9c0,1.381-1.119,2.5-2.5,2.5h-9	C7.119,43,6,41.881,6,40.5V21.413c0-2.299,1.054-4.471,2.859-5.893L23.071,4.321c0.545-0.428,1.313-0.428,1.857,0L39.142,15.52	C40.947,16.942,42,19.113,42,21.411V40.5C42,41.881,40.881,43,39.5,43z"/></svg>
               ) : (
-                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                <svg width="24" height="24" viewBox="0 0 24 24" fill="white" xmlns="http://www.w3.org/2000/svg">
                   <path d="M11.9756 1.99999C11.8157 2.00545 11.6617 2.06191 11.5361 2.16113L4.42968 7.75976C3.52773 8.47057 3 9.55675 3 10.7051V20.25C3 20.9318 3.5682 21.5 4.25 21.5H9.25C9.93179 21.5 10.5 20.9318 10.5 20.25V15.25C10.5 15.1025 10.6025 15 10.75 15H13.25C13.3975 15 13.5 15.1025 13.5 15.25V20.25C13.5 20.9318 14.0682 21.5 14.75 21.5H19.75C20.4318 21.5 21 20.9318 21 20.25V10.7051C21 9.55675 20.4722 8.47058 19.5703 7.75976L12.4639 2.16113C12.3252 2.05157 12.1522 1.9945 11.9756 1.99999ZM12 3.70507L18.6426 8.93847C19.1846 9.36565 19.5 10.0154 19.5 10.7051V20H15V15.25C15 14.2925 14.2075 13.5 13.25 13.5H10.75C9.79252 13.5 9 14.2925 9 15.25V20H4.5V10.7051C4.5 10.0154 4.81537 9.36565 5.35742 8.93847L12 3.70507Z" fill="white"/>
                 </svg>
-
               )}
               <span className="font-bold">Home</span>
-            </a>
+            </Link>
           </div>
           <div>
-            <a 
-              href="#" 
-              className={`flex items-center gap-3 p-3 rounded-md ${selectedButton === 'tendancy' ? 'bg-[#2B3236]' : 'hover:bg-[#181C1F]'}`} 
+            <Link 
+              href="/home?view=tendancy" 
+              className={`flex items-center gap-3 p-3 mt-1 rounded-md ${selectedButton === 'tendancy' ? 'bg-[#2B3236]' : 'hover:bg-[#181C1F]'}`} 
               onClick={() => handleButtonClick('tendancy')}
             >
               {selectedButton === 'tendancy' ? (
@@ -55,12 +126,12 @@ export default function Home() {
                 </svg>
               )}
               <span className="font-bold">Tendancy</span>
-            </a>
+            </Link>
           </div>
           <div>
-            <a 
-              href="#" 
-              className={`flex items-center gap-3 p-3 rounded-md ${selectedButton === 'all' ? 'bg-[#2B3236]' : 'hover:bg-[#181C1F]'}`} 
+            <Link 
+              href="/home?view=all" 
+              className={`flex items-center gap-3 p-3 mt-1 rounded-md ${selectedButton === 'all' ? 'bg-[#2B3236]' : 'hover:bg-[#181C1F]'}`} 
               onClick={() => handleButtonClick('all')}
             >
               {selectedButton === 'all' ? (
@@ -69,11 +140,11 @@ export default function Home() {
                 </svg>
               ) : (
                 <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-                  <path d="M4 21C3.16667 21 2.45833 20.7083 1.875 20.125C1.29167 19.5417 1 18.8333 1 18C1 17.1667 1.29167 16.4583 1.875 15.875C2.45833 15.2917 3.16667 15 4 15C4.15 15 4.29583 15.0125 4.4375 15.0375C4.57917 15.0625 4.71667 15.0917 4.85 15.125L8.9 9.55C8.61667 9.2 8.39583 8.80833 8.2375 8.375C8.07917 7.94167 8 7.48333 8 7C8 5.9 8.39167 4.95833 9.175 4.175C9.95833 3.39167 10.9 3 12 3C13.1 3 14.0417 3.39167 14.825 4.175C15.6083 4.95833 16 5.9 16 7C16 7.48333 15.9167 7.94167 15.75 8.375C15.5833 8.80833 15.3583 9.2 15.075 9.55L19.15 15.125C19.2833 15.0917 19.4208 15.0625 19.5625 15.0375C19.7042 15.0125 19.85 15 20 15C20.8333 15 21.5417 15.2917 22.125 15.875C22.7083 16.4583 23 17.1667 23 18C23 18.8333 22.7083 19.5417 22.125 20.125C21.5417 20.7083 20.8333 21 20 21C19.1667 21 18.4583 20.7083 17.875 20.125C17.2917 19.5417 17 18.8333 17 18C17 17.6833 17.0458 17.3792 17.1375 17.0875C17.2292 16.7958 17.3583 16.5333 17.525 16.3L13.475 10.725C13.3917 10.7583 13.3125 10.7833 13.2375 10.8C13.1625 10.8167 13.0833 10.8417 13 10.875V15.175C13.5833 15.375 14.0625 15.7333 14.4375 16.25C14.8125 16.7667 15 17.35 15 18C15 18.8333 14.7083 19.5417 14.125 20.125C13.5417 20.7083 12.8333 21 12 21C11.1667 21 10.4583 20.7083 9.875 20.125C9.29167 19.5417 9 18.8333 9 18C9 17.35 9.1875 16.7708 9.5625 16.2625C9.9375 15.7542 10.4167 15.3917 11 15.175V10.875C10.9167 10.8417 10.8375 10.8167 10.7625 10.8C10.6875 10.7833 10.6083 10.7583 10.525 10.725L6.475 16.3C6.64167 16.5333 6.77083 16.7958 6.8625 17.0875C6.95417 17.3792 7 17.6833 7 18C7 18.8333 6.70833 19.5417 6.125 20.125C5.54167 20.7083 4.83333 21 4 21ZM4 19C4.28333 19 4.52083 18.9042 4.7125 18.7125C4.90417 18.5208 5 18.2833 5 18C5 17.7167 4.90417 17.4792 4.7125 17.2875C4.52083 17.0958 4.28333 17 4 17C3.71667 17 3.47917 17.0958 3.2875 17.2875C3.09583 17.4792 3 17.7167 3 18C3 18.2833 3.09583 18.5208 3.2875 18.7125C3.47917 18.9042 3.71667 19 4 19ZM12 19C12.2833 19 12.5208 18.9042 12.7125 18.7125C12.9042 18.5208 13 18.2833 13 18C13 17.7167 12.9042 17.4792 12.7125 17.2875C12.5208 17.0958 12.2833 17 12 17C11.7167 17 11.4792 17.0958 11.2875 17.2875C11.0958 17.4792 11 17.7167 11 18C11 18.2833 11.0958 18.5208 11.2875 18.7125C11.4792 18.9042 11.7167 19 12 19ZM20 19C20.2833 19 20.5208 18.9042 20.7125 18.7125C20.9042 18.5208 21 18.2833 21 18C21 17.7167 20.9042 17.4792 20.7125 17.2875C20.5208 17.0958 20.2833 17 20 17C19.7167 17 19.4792 17.0958 19.2875 17.2875C19.0958 17.4792 19 17.7167 19 18C19 18.2833 19.0958 18.5208 19.2875 18.7125C19.4792 18.9042 19.7167 19 20 19ZM12 9C12.55 9 13.0208 8.80417 13.4125 8.4125C13.8042 8.02083 14 7.55 14 7C14 6.45 13.8042 5.97917 13.4125 5.5875C13.0208 5.19583 12.55 5 12 5C11.45 5 10.9792 5.19583 10.5875 5.5875C10.1958 5.97917 10 6.45 10 7C10 7.55 10.1958 8.02083 10.5875 8.4125C10.9792 8.80417 11.45 9 12 9Z" fill="white"/>
+                  <path d="M4 21C3.16667 21 2.45833 20.7083 1.875 20.125C1.29167 19.5417 1 18.8333 1 18C1 17.1667 1.29167 16.4583 1.875 15.875C2.45833 15.2917 3.16667 15 4 15C4.15 15 4.29583 15.0125 4.4375 15.0375C4.57917 15.0625 4.71667 15.0917 4.85 15.125L8.9 9.55C8.61667 9.2 8.39583 8.80833 8.2375 8.375C8.07917 7.94167 8 7.48333 8 7C8 5.9 8.39167 4.95833 9.175 4.175C9.95833 3.39167 10.9 3 12 3C13.1 3 14.0417 3.39167 14.825 4.175C15.6083 4.95833 16 5.9 16 7C16 7.48333 15.9167 7.94167 15.75 8.375C15.5833 8.80833 15.3583 9.2 15.075 9.55L19.15 15.125C19.2833 15.0917 19.4208 15.0625 19.5625 15.0375C19.7042 15.0125 19.85 15 20 15C20.8333 15 21.5417 15.2917 22.125 15.875C22.7083 16.4583 23 17.1667 23 18C23 18.8333 22.7083 19.5417 22.125 20.125C21.5417 20.7083 20.8333 21 20 21C19.1667 21 18.4583 20.7083 17.875 20.125C17.2917 19.5417 17 18.8333 17 18C17 17.6833 17.0458 17.3792 17.1375 17.0875C17.2292 16.7958 17.3583 16.5333 17.525 16.3L13.475 10.725C13.3917 10.7583 13.3125 10.7833 13.2375 10.8C13.1625 10.8167 13.0833 10.8417 13 10.875V15.175C13.5833 15.375 14.0625 15.7333 14.4375 16.25C14.8125 16.7667 15 17.35 15 18C15 18.8333 14.7083 19.5417 14.125 20.125C13.5417 20.7083 12.8333 21 12 21C11.1667 21 10.4583 20.7083 9.875 20.125C9.29167 19.5417 9 18.8333 9 18C9 17.35 9.1875 16.7708 9.5625 16.2625C9.9375 15.7542 10.4167 15.3917 11 15.175V10.875C10.9167 10.8417 10.8375 10.8167 10.7625 10.8C10.6875 10.7833 10.6083 10.7583 10.525 10.725L6.475 16.3C6.64167 16.5333 6.77083 16.7958 6.8625 17.0875C6.95417 17.3792 7 17.6833 7 18C7 18.8333 6.70833 19.5417 6.125 20.125C5.54167 20.7083 4.83333 21 4 21Z" fill="white"/>
                 </svg>
               )}
               <span className="font-bold">All</span>
-            </a>
+            </Link>
           </div>
         </nav>
 
@@ -105,28 +176,63 @@ export default function Home() {
           </div>
           
           <div className="flex items-center space-x-4">
-            <a href="/create-post" className="flex flex-row justify-center items-center gap-1 px-2 py-2 pr-3 rounded-full text-sm font-medium hover:bg-[#333D42]">
+            <Link href="/create-post" className="flex flex-row justify-center items-center gap-1 px-2 py-2 rounded-full text-sm font-medium hover:bg-[#333D42]">
               <svg xmlns="http://www.w3.org/2000/svg" height="24px" viewBox="0 -960 960 960" width="24px" fill="#FFFFFF"><path d="M440-440H200v-80h240v-240h80v240h240v80H520v240h-80v-240Z"/></svg>
               Create
-            </a>
+            </Link>
             <button className="p-1">
               <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 17h5l-1.405-1.405A2.032 2.032 0 0118 14.158V11a6.002 6.002 0 00-4-5.659V5a2 2 0 10-4 0v.341C7.67 6.165 6 8.388 6 11v3.159c0 .538-.214 1.055-.595 1.436L4 17h5m6 0v1a3 3 0 11-6 0v-1m6 0H9" />
               </svg>
             </button>
             <div className="w-8 h-8 bg-gray-200 rounded-full"></div>
+            <UserMenu />
           </div>
         </header>
 
         <div className="flex flex-col Justify-center items-center w-full">
           <PostCard/>
 
-          <form>
+          <form onSubmit={handleSubmit} className="flex flex-col gap-4 w-full max-w-2xl">
+              <select
+                value={selectedCommunity}
+                onChange={(e) => setSelectedCommunity(e.target.value)}
+                className="w-full px-4 py-2 rounded-lg text-white bg-[#2B3236] border border-[#C7C7C7] focus:outline-none focus:ring-2 focus:ring-[#3FDEE1]"
+                required
+                disabled={isSubmitting}
+              >
+                <option value="">Sélectionner une communauté</option>
+                {communities.map((community) => (
+                  <option key={community.id} value={community.id}>
+                    {community.attributes.name}
+                  </option>
+                ))}
+              </select>
               <input
-              type="text"
-              placeholder="Join the conversation"
-              className="w-2xl px-13 py-4 rounded-3xl text-white border border-[#C7C7C7] placeholder-[#C7C7C7] placeholder- focus:outline-none focus:ring-2 focus:ring-[#3FDEE1]"
+                type="text"
+                placeholder="Titre du post"
+                className="w-full px-4 py-2 rounded-lg text-white bg-[#2B3236] border border-[#C7C7C7] placeholder-[#C7C7C7] focus:outline-none focus:ring-2 focus:ring-[#3FDEE1]"
+                value={postTitle}
+                onChange={(e) => setPostTitle(e.target.value)}
+                disabled={isSubmitting}
+                required
               />
+              <input
+                type="text"
+                placeholder="Join the conversation"
+                className="w-full px-4 py-4 rounded-3xl text-white border border-[#C7C7C7] placeholder-[#C7C7C7] focus:outline-none focus:ring-2 focus:ring-[#3FDEE1]"
+                value={postContent}
+                onChange={(e) => setPostContent(e.target.value)}
+                disabled={isSubmitting}
+                required
+              />
+              <button 
+                type="submit" 
+                className="self-end px-6 py-2 bg-[#3FDEE1] text-white rounded-full hover:bg-[#2FB8BB] disabled:opacity-50"
+                disabled={isSubmitting}
+              >
+                {isSubmitting ? 'Envoi...' : 'Publier'}
+              </button>
           </form>
 
           <PostComment/>

@@ -14,7 +14,7 @@
     "statu": {
       "type": "enumeration",
       "enum": [
-        "active ",
+        "active",
         "panned",
         "muted"
       ],
@@ -40,6 +40,12 @@
       "type": "relation",
       "relation": "oneToOne",
       "target": "plugin::users-permissions.user"
+    },
+    "community": {
+      "type": "relation",
+      "relation": "manyToOne",
+      "target": "api::community.community",
+      "inversedBy": "community_members"
     }
   }
 }

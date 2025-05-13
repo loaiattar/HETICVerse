@@ -19,22 +19,22 @@
       "type": "integer",
       "default": 0
     },
-    "post": {
+    "user": {
       "type": "relation",
-      "relation": "oneToOne",
-      "target": "api::post.post",
-      "inversedBy": "comment"
-    },
-    "users_permissions_user": {
-      "type": "relation",
-      "relation": "oneToOne",
+      "relation": "manyToOne",
       "target": "plugin::users-permissions.user",
-      "inversedBy": "comment"
+      "inversedBy": "comments"
     },
     "comments": {
       "type": "relation",
       "relation": "oneToMany",
       "target": "api::comment.comment"
+    },
+    "post": {
+      "type": "relation",
+      "relation": "manyToOne",
+      "target": "api::post.post",
+      "inversedBy": "comments"
     }
   }
 }

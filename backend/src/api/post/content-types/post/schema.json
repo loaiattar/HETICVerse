@@ -16,10 +16,6 @@
     }
   },
   "attributes": {
-    "title": {
-      "type": "string",
-      "required": true
-    },
     "content": {
       "type": "blocks",
       "required": true
@@ -53,25 +49,24 @@
     "comments": {
       "type": "relation",
       "relation": "oneToMany",
-      "target": "api::comment.comment"
+      "target": "api::comment.comment",
+      "mappedBy": "post"
     },
     "community": {
       "type": "relation",
-      "relation": "oneToOne",
+      "relation": "manyToOne",
       "target": "api::community.community",
-      "inversedBy": "post"
+      "inversedBy": "posts"
     },
-    "users_permissions_user": {
+    "user": {
       "type": "relation",
-      "relation": "oneToOne",
+      "relation": "manyToOne",
       "target": "plugin::users-permissions.user",
-      "inversedBy": "post"
+      "inversedBy": "posts"
     },
-    "comment": {
-      "type": "relation",
-      "relation": "oneToOne",
-      "target": "api::comment.comment",
-      "mappedBy": "post"
+    "title": {
+      "type": "string",
+      "required": true
     }
   }
 }

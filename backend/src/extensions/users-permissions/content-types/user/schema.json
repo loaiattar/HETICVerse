@@ -65,18 +65,6 @@
       "inversedBy": "users",
       "configurable": false
     },
-    "post": {
-      "type": "relation",
-      "relation": "oneToOne",
-      "target": "api::post.post",
-      "mappedBy": "users_permissions_user"
-    },
-    "comment": {
-      "type": "relation",
-      "relation": "oneToOne",
-      "target": "api::comment.comment",
-      "mappedBy": "users_permissions_user"
-    },
     "community_members": {
       "type": "relation",
       "relation": "oneToMany",
@@ -141,6 +129,18 @@
       "relation": "manyToOne",
       "target": "api::video-call.video-call",
       "inversedBy": "users_permissions_users"
+    },
+    "comments": {
+      "type": "relation",
+      "relation": "oneToMany",
+      "target": "api::comment.comment",
+      "mappedBy": "user"
+    },
+    "posts": {
+      "type": "relation",
+      "relation": "oneToMany",
+      "target": "api::post.post",
+      "mappedBy": "user"
     }
   }
 }

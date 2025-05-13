@@ -511,13 +511,13 @@ export interface ApiCommentComment extends Struct.CollectionTypeSchema {
       'api::comment.comment'
     > &
       Schema.Attribute.Private;
-    post: Schema.Attribute.Relation<'oneToOne', 'api::post.post'>;
+    post: Schema.Attribute.Relation<'manyToOne', 'api::post.post'>;
     publishedAt: Schema.Attribute.DateTime;
     updatedAt: Schema.Attribute.DateTime;
     updatedBy: Schema.Attribute.Relation<'oneToOne', 'admin::user'> &
       Schema.Attribute.Private;
-    users_permissions_user: Schema.Attribute.Relation<
-      'oneToOne',
+    user: Schema.Attribute.Relation<
+      'manyToOne',
       'plugin::users-permissions.user'
     >;
     votes: Schema.Attribute.Integer & Schema.Attribute.DefaultTo<0>;
@@ -575,6 +575,10 @@ export interface ApiCommunityMemberCommunityMember
     draftAndPublish: true;
   };
   attributes: {
+    community: Schema.Attribute.Relation<
+      'manyToOne',
+      'api::community.community'
+    >;
     createdAt: Schema.Attribute.DateTime;
     createdBy: Schema.Attribute.Relation<'oneToOne', 'admin::user'> &
       Schema.Attribute.Private;
@@ -589,7 +593,7 @@ export interface ApiCommunityMemberCommunityMember
     Role: Schema.Attribute.Enumeration<['member', 'moderator', 'admin']> &
       Schema.Attribute.DefaultTo<'member'>;
     since: Schema.Attribute.Date & Schema.Attribute.Required;
-    statu: Schema.Attribute.Enumeration<['active ', 'panned', 'muted']> &
+    statu: Schema.Attribute.Enumeration<['active', 'panned', 'muted']> &
       Schema.Attribute.DefaultTo<'active '>;
     updatedAt: Schema.Attribute.DateTime;
     updatedBy: Schema.Attribute.Relation<'oneToOne', 'admin::user'> &
@@ -656,7 +660,7 @@ export interface ApiCommunityCommunity extends Struct.CollectionTypeSchema {
     name: Schema.Attribute.String &
       Schema.Attribute.Required &
       Schema.Attribute.Unique;
-    post: Schema.Attribute.Relation<'oneToOne', 'api::post.post'>;
+    posts: Schema.Attribute.Relation<'oneToMany', 'api::post.post'>;
     privacy: Schema.Attribute.Enumeration<['public', 'private', 'restricted']> &
       Schema.Attribute.DefaultTo<'public'>;
     publishedAt: Schema.Attribute.DateTime;
@@ -865,10 +869,9 @@ export interface ApiPostPost extends Struct.CollectionTypeSchema {
     };
   };
   attributes: {
-    comment: Schema.Attribute.Relation<'oneToOne', 'api::comment.comment'>;
     comments: Schema.Attribute.Relation<'oneToMany', 'api::comment.comment'>;
     community: Schema.Attribute.Relation<
-      'oneToOne',
+      'manyToOne',
       'api::community.community'
     >;
     content: Schema.Attribute.Blocks & Schema.Attribute.Required;
@@ -888,8 +891,8 @@ export interface ApiPostPost extends Struct.CollectionTypeSchema {
     updatedBy: Schema.Attribute.Relation<'oneToOne', 'admin::user'> &
       Schema.Attribute.Private;
     URL: Schema.Attribute.String;
-    users_permissions_user: Schema.Attribute.Relation<
-      'oneToOne',
+    user: Schema.Attribute.Relation<
+      'manyToOne',
       'plugin::users-permissions.user'
     >;
     vote: Schema.Attribute.Integer & Schema.Attribute.DefaultTo<0>;
@@ -1513,7 +1516,7 @@ export interface PluginUsersPermissionsUser
       'oneToMany',
       'api::chat-room.chat-room'
     >;
-    comment: Schema.Attribute.Relation<'oneToOne', 'api::comment.comment'>;
+    comments: Schema.Attribute.Relation<'oneToMany', 'api::comment.comment'>;
     communities: Schema.Attribute.Relation<
       'oneToMany',
       'api::community.community'
@@ -1564,7 +1567,7 @@ export interface PluginUsersPermissionsUser
       Schema.Attribute.SetMinMaxLength<{
         minLength: 6;
       }>;
-    post: Schema.Attribute.Relation<'oneToOne', 'api::post.post'>;
+    posts: Schema.Attribute.Relation<'oneToMany', 'api::post.post'>;
     provider: Schema.Attribute.String;
     publishedAt: Schema.Attribute.DateTime;
     resetPasswordToken: Schema.Attribute.String & Schema.Attribute.Private;
