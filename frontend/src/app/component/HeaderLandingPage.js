@@ -107,10 +107,22 @@ export default function Header() {
       }, "phase2")
       .to(hiddenVerseRef.current, {
         opacity: 1,
-        x: 0,
+        x: -10,
         duration: 0.15,
         ease: 'back.inOut'
-      }, "phase2");
+      }, "phase2")
+      .to([letterHRef.current, letterERef.current, letterTRef.current, letterIRef.current, letterCRef.current, letterVRef.current], {
+        opacity: 1,
+        x: -10,
+        duration: 0.15,
+        ease: 'back.inOut'
+      }, "phase2")
+      .to(letterVRef.current, {
+        opacity: 1,
+        x: -5,
+        duration: 0.15,
+        ease: 'back.inOut'
+      }, "phase2")
     
     // Cleanup function
     return () => {
