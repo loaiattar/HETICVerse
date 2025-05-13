@@ -21,7 +21,7 @@ export default function Home() {
   const handleToggleUploadMedia = () => {
     setShowUploadMedia(prev => !prev)
   }
-
+  
   return (
     <div className="flex min-h-screen bg-[#121212] text-white">
       {/* Sidebar */}
