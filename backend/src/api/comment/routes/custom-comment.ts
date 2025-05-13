@@ -1,4 +1,4 @@
-// src/api/comment/routes/custom-comment.ts
+
 
 export default {
   routes: [
