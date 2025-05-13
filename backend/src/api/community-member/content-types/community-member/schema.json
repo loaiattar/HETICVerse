@@ -4,31 +4,42 @@
   "info": {
     "singularName": "community-member",
     "pluralName": "community-members",
-    "displayName": "Community Member"
+    "displayName": "Community-Member",
+    "description": ""
   },
   "options": {
-    "draftAndPublish": false
+    "draftAndPublish": true
   },
   "attributes": {
-    "user": {
-      "type": "relation",
-      "relation": "manyToOne",
-      "target": "plugin::users-permissions.user",
-      "inversedBy": "communityMemberships"
-    },
-    "community": {
-      "type": "relation",
-      "relation": "manyToOne",
-      "target": "api::community.community",
-      "inversedBy": "members"
-    },
-    "role": {
+    "statu": {
       "type": "enumeration",
-      "enum": ["owner", "moderator", "member"],
+      "enum": [
+        "active ",
+        "panned",
+        "muted"
+      ],
+      "default": "active "
+    },
+    "Role": {
+      "type": "enumeration",
+      "enum": [
+        "member",
+        "moderator",
+        "admin"
+      ],
       "default": "member"
     },
-    "joinedAt": {
-      "type": "datetime"
+    "since": {
+      "type": "date",
+      "required": true
+    },
+    "lastActive": {
+      "type": "date"
+    },
+    "users_permissions_user": {
+      "type": "relation",
+      "relation": "oneToOne",
+      "target": "plugin::users-permissions.user"
     }
   }
 }

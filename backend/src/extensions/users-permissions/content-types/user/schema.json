@@ -65,81 +65,82 @@
       "inversedBy": "users",
       "configurable": false
     },
-    "profilePicture": {
-      "type": "media",
-      "multiple": false,
-      "required": false,
-      "allowedTypes": ["images"]
-    },
-    "bio": {
-      "type": "text"
-    },
-    "favoriteColor": {
-      "type": "string"
-    },
-    "birthday": {
-      "type": "date"
-    },
-    "karma": {
-      "type": "integer",
-      "default": 0
-    },
-    "badges": {
-      "type": "json"
-    },
-    "following": {
+    "post": {
       "type": "relation",
-      "relation": "manyToMany",
-      "target": "plugin::users-permissions.user",
-      "inversedBy": "followers"
-    },
-    "followers": {
-      "type": "relation",
-      "relation": "manyToMany",
-      "target": "plugin::users-permissions.user",
-      "inversedBy": "following"
-    },
-    "posts": {
-      "type": "relation",
-      "relation": "oneToMany",
+      "relation": "oneToOne",
       "target": "api::post.post",
-      "mappedBy": "author"
-    },
-    "comments": {
-      "type": "relation",
-      "relation": "oneToMany",
-      "target": "api::comment.comment",
-      "mappedBy": "author"
-    },
-    "votes": {
-      "type": "relation",
-      "relation": "oneToMany",
-      "target": "api::vote.vote",
       "mappedBy": "users_permissions_user"
     },
-    "sub_hetic_verses": {
+    "comment": {
+      "type": "relation",
+      "relation": "oneToOne",
+      "target": "api::comment.comment",
+      "mappedBy": "users_permissions_user"
+    },
+    "community_members": {
       "type": "relation",
       "relation": "oneToMany",
-      "target": "api::sub-hetic-verse.sub-hetic-verse",
-      "mappedBy": "author"
+      "target": "api::community-member.community-member"
     },
-    "conversations": {
-      "type": "relation",
-      "relation": "manyToMany",
-      "target": "api::chat.conversation",
-      "mappedBy": "participants"
-    },
-     "ownedCommunities": {
+    "community_invitations": {
       "type": "relation",
       "relation": "oneToMany",
-      "target": "api::community.community",
-      "mappedBy": "owner"
+      "target": "api::community-invitation.community-invitation"
     },
-    "communityMemberships": {
+    "communities": {
       "type": "relation",
       "relation": "oneToMany",
-      "target": "api::community-member.community-member",
+      "target": "api::community.community"
+    },
+    "notification": {
+      "type": "relation",
+      "relation": "oneToOne",
+      "target": "api::notification.notification",
+      "mappedBy": "users_permissions_user"
+    },
+    "chat_rooms": {
+      "type": "relation",
+      "relation": "oneToMany",
+      "target": "api::chat-room.chat-room",
       "mappedBy": "user"
+    },
+    "follows": {
+      "type": "relation",
+      "relation": "oneToMany",
+      "target": "api::follow.follow"
+    },
+    "bookmarks": {
+      "type": "relation",
+      "relation": "oneToMany",
+      "target": "api::bookmark.bookmark"
+    },
+    "join_requests": {
+      "type": "relation",
+      "relation": "oneToMany",
+      "target": "api::join-request.join-request"
+    },
+    "notifications": {
+      "type": "relation",
+      "relation": "oneToMany",
+      "target": "api::notification.notification"
+    },
+    "user_presence": {
+      "type": "relation",
+      "relation": "oneToOne",
+      "target": "api::user-presence.user-presence",
+      "mappedBy": "users_permissions_user"
+    },
+    "notification_preference": {
+      "type": "relation",
+      "relation": "oneToOne",
+      "target": "api::notification-preference.notification-preference",
+      "mappedBy": "user"
+    },
+    "video_call": {
+      "type": "relation",
+      "relation": "manyToOne",
+      "target": "api::video-call.video-call",
+      "inversedBy": "users_permissions_users"
     }
   }
 }

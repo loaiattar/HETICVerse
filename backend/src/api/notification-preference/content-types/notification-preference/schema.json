@@ -1,0 +1,48 @@
+{
+  "kind": "collectionType",
+  "collectionName": "notification_preferences",
+  "info": {
+    "singularName": "notification-preference",
+    "pluralName": "notification-preferences",
+    "displayName": "Notification-Preference"
+  },
+  "options": {
+    "draftAndPublish": true
+  },
+  "attributes": {
+    "EmailNotifications": {
+      "type": "boolean",
+      "default": true
+    },
+    "PushNotifications": {
+      "type": "boolean",
+      "default": true
+    },
+    "CommentNotifications": {
+      "type": "boolean",
+      "default": true
+    },
+    "followNotifs": {
+      "type": "boolean",
+      "default": true
+    },
+    "msgsNotifs": {
+      "type": "boolean",
+      "default": true
+    },
+    "communityNotifications": {
+      "type": "boolean",
+      "default": true
+    },
+    "mentionNotifications": {
+      "type": "boolean",
+      "default": true
+    },
+    "user": {
+      "type": "relation",
+      "relation": "oneToOne",
+      "target": "plugin::users-permissions.user",
+      "inversedBy": "notification_preference"
+    }
+  }
+}

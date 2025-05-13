@@ -1,5 +1,5 @@
 {
-  "name": "hetic-verse",
+  "name": "backend",
   "version": "0.1.0",
   "private": true,
   "description": "A Strapi application",
@@ -15,15 +15,15 @@
     "upgrade:dry": "npx @strapi/upgrade latest --dry"
   },
   "dependencies": {
-    "@strapi/plugin-cloud": "^5.12.6",
-    "@strapi/plugin-users-permissions": "^5.12.6",
-    "@strapi/strapi": "^5.12.6",
-    "better-sqlite3": "^11.3.0",
-    "pg": "^8.15.6",
+    "@strapi/plugin-cloud": "5.13.0",
+    "@strapi/plugin-users-permissions": "^5.13.0",
+    "@strapi/strapi": "5.13.0",
+    "better-sqlite3": "11.3.0",
+    "pg": "^8.16.0",
     "react": "^18.0.0",
     "react-dom": "^18.0.0",
     "react-router-dom": "^6.0.0",
-    "socket.io": "^4.7.2",
+    "socket.io": "^4.8.1",
     "styled-components": "^6.0.0"
   },
   "devDependencies": {
@@ -37,6 +37,7 @@
     "npm": ">=6.0.0"
   },
   "strapi": {
-    "uuid": "3b5204e5-f569-4fd0-9770-41f7ff17b6aa"
+    "uuid": "320648c9-7de9-4bbf-91ca-bd27f092ad93",
+    "installId": "8bd9e50a4797fba4553a9e526cae2499573db6f98ea2c90eecaa32274ed5c899"
   }
 }

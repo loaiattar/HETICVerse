@@ -17,73 +17,61 @@
   },
   "attributes": {
     "title": {
-      "type": "string"
+      "type": "string",
+      "required": true
     },
-    "publish_time": {
-      "type": "datetime"
+    "content": {
+      "type": "blocks",
+      "required": true
     },
-    "author": {
-      "type": "relation",
-      "relation": "manyToOne",
-      "target": "plugin::users-permissions.user"
+    "vote": {
+      "type": "integer",
+      "default": 0
     },
-    "comments": {
-      "type": "relation",
-      "relation": "oneToMany",
-      "target": "api::comment.comment",
-      "mappedBy": "post"
+    "type": {
+      "type": "enumeration",
+      "enum": [
+        "link",
+        "text",
+        "image"
+      ]
     },
     "image": {
+      "type": "media",
+      "multiple": true,
+      "required": false,
       "allowedTypes": [
         "images",
         "files",
         "videos",
         "audios"
-      ],
-      "type": "media",
-      "multiple": true
+      ]
     },
-    "content": {
-      "type": "text"
+    "URL": {
+      "type": "string"
     },
-    "sub_hetic_verse": {
-      "type": "relation",
-      "relation": "manyToOne",
-      "target": "api::sub-hetic-verse.sub-hetic-verse",
-      "inversedBy": "posts"
-    },
-    "votes": {
+    "comments": {
       "type": "relation",
       "relation": "oneToMany",
-      "target": "api::vote.vote",
-      "mappedBy": "post"
-    },
-    "isAnonymous": {
-      "type": "boolean",
-      "default": false
-    },
-    "anonymousName": {
-      "type": "string",
-      "default": "Anonymous"
-    },
-    "scheduledFor": {
-      "type": "datetime",
-      "private": true
-    },
-    "status": {
-      "type": "enumeration",
-      "enum": ["draft", "scheduled", "published"],
-      "default": "draft"
+      "target": "api::comment.comment"
     },
     "community": {
       "type": "relation",
-      "relation": "manyToOne",
+      "relation": "oneToOne",
       "target": "api::community.community",
-      "inversedBy": "posts"
+      "inversedBy": "post"
     },
-    "karma": {
-  "type": "integer",
-  "default": 0
-   }
+    "users_permissions_user": {
+      "type": "relation",
+      "relation": "oneToOne",
+      "target": "plugin::users-permissions.user",
+      "inversedBy": "post"
+    },
+    "comment": {
+      "type": "relation",
+      "relation": "oneToOne",
+      "target": "api::comment.comment",
+      "mappedBy": "post"
+    }
   }
 }

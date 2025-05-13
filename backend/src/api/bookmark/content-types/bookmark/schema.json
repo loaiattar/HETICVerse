@@ -4,30 +4,28 @@
   "info": {
     "singularName": "bookmark",
     "pluralName": "bookmarks",
-    "displayName": "Bookmark",
-    "description": "User bookmarked posts"
+    "displayName": "Bookmark"
   },
   "options": {
-    "draftAndPublish": false
+    "draftAndPublish": true
   },
   "attributes": {
-    "user": {
+    "date": {
+      "required": true,
+      "type": "date"
+    },
+    "notes": {
+      "type": "text"
+    },
+    "users_permissions_user": {
       "type": "relation",
-      "relation": "manyToOne",
+      "relation": "oneToOne",
       "target": "plugin::users-permissions.user"
     },
     "post": {
       "type": "relation",
-      "relation": "manyToOne",
+      "relation": "oneToOne",
       "target": "api::post.post"
-    },
-    "notes": {
-      "type": "text",
-      "description": "User's personal notes about this bookmarked post"
-    },
-    "collection": {
-      "type": "string",
-      "description": "Optional category/collection name for organizing bookmarks"
     }
   }
 }

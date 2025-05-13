@@ -4,37 +4,40 @@
   "info": {
     "singularName": "community-invitation",
     "pluralName": "community-invitations",
-    "displayName": "Community Invitation"
+    "displayName": "Community-Invitation"
   },
   "options": {
-    "draftAndPublish": false
+    "draftAndPublish": true
   },
   "attributes": {
-    "community": {
-      "type": "relation",
-      "relation": "manyToOne",
-      "target": "api::community.community"
-    },
-    "inviter": {
-      "type": "relation",
-      "relation": "manyToOne",
-      "target": "plugin::users-permissions.user"
-    },
-    "invitee": {
-      "type": "relation",
-      "relation": "manyToOne",
-      "target": "plugin::users-permissions.user"
-    },
-    "status": {
+    "statu": {
       "type": "enumeration",
-      "enum": ["pending", "accepted", "rejected"],
+      "enum": [
+        "pending",
+        "accepted",
+        "rejected"
+      ],
       "default": "pending"
     },
-    "message": {
-      "type": "text"
+    "invitationDate": {
+      "type": "date",
+      "required": true
     },
-    "expiresAt": {
-      "type": "datetime"
+    "responseDate": {
+      "type": "date"
+    },
+    "message": {
+      "type": "string"
+    },
+    "admin_user": {
+      "type": "relation",
+      "relation": "oneToOne",
+      "target": "admin::user"
+    },
+    "users_permissions_users": {
+      "type": "relation",
+      "relation": "oneToMany",
+      "target": "plugin::users-permissions.user"
     }
   }
 }

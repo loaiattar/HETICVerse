@@ -4,37 +4,49 @@
   "info": {
     "singularName": "join-request",
     "pluralName": "join-requests",
-    "displayName": "Join Request"
+    "displayName": "Join-Request"
   },
   "options": {
-    "draftAndPublish": false
+    "draftAndPublish": true
   },
   "attributes": {
-    "community": {
-      "type": "relation",
-      "relation": "manyToOne",
-      "target": "api::community.community"
-    },
-    "requester": {
-      "type": "relation",
-      "relation": "manyToOne",
-      "target": "plugin::users-permissions.user"
-    },
-    "status": {
+    "statu": {
       "type": "enumeration",
-      "enum": ["pending", "approved", "rejected"],
+      "enum": [
+        "pending",
+        "approved",
+        "rejected"
+      ],
       "default": "pending"
+    },
+    "requestDate": {
+      "type": "date",
+      "required": true
+    },
+    "responseDate": {
+      "type": "date"
     },
     "message": {
       "type": "text"
     },
-    "reviewedBy": {
+    "responseMessage": {
+      "type": "string"
+    },
+    "users_permissions_user": {
       "type": "relation",
-      "relation": "manyToOne",
+      "relation": "oneToOne",
       "target": "plugin::users-permissions.user"
     },
-    "reviewedAt": {
-      "type": "datetime"
+    "admin_user": {
+      "type": "relation",
+      "relation": "oneToOne",
+      "target": "admin::user"
+    },
+    "community": {
+      "type": "relation",
+      "relation": "oneToOne",
+      "target": "api::community.community",
+      "inversedBy": "join_request"
     }
   }
 }
