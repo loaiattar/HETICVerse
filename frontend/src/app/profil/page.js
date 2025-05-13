@@ -4,6 +4,7 @@ import { useState } from 'react'
 import Communities from '../component/FollowedCommunities'
 import RecentCommunities from '../component/RecentCommunities'
 import PostCard from '../component/PostCard'
+import ProfilDescription from '../component/ProfilDescription'
 
 export default function Home() {
   const [selectedButton, setSelectedButton] = useState('home')
@@ -117,8 +118,17 @@ export default function Home() {
           </div>
         </header>
         
-        <div className="flex flex-column Justify-center items-center px-35 py-5">
-          <PostCard/>
+        <div className="px-35 py-5">
+          <div className='flex flex-row justify-between'>
+            <div className='flex flex-col gap-3'>
+                <div className='flex flex-row items-center gap-3'>
+                    <div className='w-18 h-18 bg-gray-200 rounded-full'></div>
+                    <h1 className='text-2xl'>Cherif_Kamel</h1>
+                </div>
+              <PostCard />
+            </div>
+            <ProfilDescription />
+          </div>
         </div>
         
       </div>
