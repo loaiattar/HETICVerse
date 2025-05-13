@@ -1,0 +1,120 @@
+{
+  "kind": "collectionType",
+  "collectionName": "communities",
+  "info": {
+    "singularName": "community",
+    "pluralName": "communities",
+    "displayName": "community",
+    "description": ""
+  },
+  "options": {
+    "draftAndPublish": true
+  },
+  "attributes": {
+    "name": {
+      "type": "string",
+      "required": true,
+      "unique": true
+    },
+    "description": {
+      "type": "text"
+    },
+    "rules": {
+      "type": "blocks"
+    },
+    "image": {
+      "type": "media",
+      "multiple": true,
+      "required": false,
+      "allowedTypes": [
+        "images",
+        "files",
+        "videos",
+        "audios"
+      ]
+    },
+    "post": {
+      "type": "relation",
+      "relation": "oneToOne",
+      "target": "api::post.post",
+      "mappedBy": "community"
+    },
+    "users_permissions_users": {
+      "type": "relation",
+      "relation": "oneToMany",
+      "target": "plugin::users-permissions.user"
+    },
+    "community_members": {
+      "type": "relation",
+      "relation": "oneToMany",
+      "target": "api::community-member.community-member"
+    },
+    "community_invitations": {
+      "type": "relation",
+      "relation": "oneToMany",
+      "target": "api::community-invitation.community-invitation"
+    },
+    "join_request": {
+      "type": "relation",
+      "relation": "oneToOne",
+      "target": "api::join-request.join-request",
+      "mappedBy": "community"
+    },
+    "join_requests": {
+      "type": "relation",
+      "relation": "oneToMany",
+      "target": "api::join-request.join-request"
+    },
+    "slug": {
+      "type": "string",
+      "required": true,
+      "unique": true
+    },
+    "privacy": {
+      "type": "enumeration",
+      "enum": [
+        "public",
+        "private",
+        "restricted"
+      ],
+      "default": "public"
+    },
+    "category": {
+      "type": "enumeration",
+      "enum": [
+        "academic",
+        "social",
+        "clubs",
+        "other"
+      ],
+      "default": "other"
+    },
+    "Visibility": {
+      "type": "boolean",
+      "default": true
+    },
+    "bannerMedia": {
+      "allowedTypes": [
+        "images",
+        "files",
+        "videos",
+        "audios"
+      ],
+      "type": "media",
+      "multiple": true
+    },
+    "memberCount": {
+      "type": "integer"
+    },
+    "creatinDate": {
+      "type": "date",
+      "required": true
+    },
+    "video_call": {
+      "type": "relation",
+      "relation": "oneToOne",
+      "target": "api::video-call.video-call",
+      "mappedBy": "community"
+    }
+  }
+}

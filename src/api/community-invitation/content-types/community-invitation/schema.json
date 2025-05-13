@@ -1,0 +1,43 @@
+{
+  "kind": "collectionType",
+  "collectionName": "community_invitations",
+  "info": {
+    "singularName": "community-invitation",
+    "pluralName": "community-invitations",
+    "displayName": "Community-Invitation"
+  },
+  "options": {
+    "draftAndPublish": true
+  },
+  "attributes": {
+    "statu": {
+      "type": "enumeration",
+      "enum": [
+        "pending",
+        "accepted",
+        "rejected"
+      ],
+      "default": "pending"
+    },
+    "invitationDate": {
+      "type": "date",
+      "required": true
+    },
+    "responseDate": {
+      "type": "date"
+    },
+    "message": {
+      "type": "string"
+    },
+    "admin_user": {
+      "type": "relation",
+      "relation": "oneToOne",
+      "target": "admin::user"
+    },
+    "users_permissions_users": {
+      "type": "relation",
+      "relation": "oneToMany",
+      "target": "plugin::users-permissions.user"
+    }
+  }
+}

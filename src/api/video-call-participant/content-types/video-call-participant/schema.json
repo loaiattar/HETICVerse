@@ -1,0 +1,52 @@
+{
+  "kind": "collectionType",
+  "collectionName": "video_call_participants",
+  "info": {
+    "singularName": "video-call-participant",
+    "pluralName": "video-call-participants",
+    "displayName": "Video-Call-Participant"
+  },
+  "options": {
+    "draftAndPublish": true
+  },
+  "attributes": {
+    "JoinTime": {
+      "type": "datetime",
+      "required": true
+    },
+    "LeaveTime": {
+      "type": "datetime"
+    },
+    "Statu": {
+      "type": "enumeration",
+      "enum": [
+        "joined",
+        "left",
+        "kicked"
+      ],
+      "default": "joined"
+    },
+    "HasCamera": {
+      "type": "boolean",
+      "default": true
+    },
+    "HasMicrophone": {
+      "type": "boolean",
+      "default": true
+    },
+    "IsScreenSharing": {
+      "type": "boolean",
+      "default": false
+    },
+    "users_permissions_user": {
+      "type": "relation",
+      "relation": "oneToOne",
+      "target": "plugin::users-permissions.user"
+    },
+    "video_call": {
+      "type": "relation",
+      "relation": "oneToOne",
+      "target": "api::video-call.video-call"
+    }
+  }
+}
