@@ -1,0 +1,66 @@
+{
+    "kind": "collectionType",
+    "collectionName": "video_calls",
+    "info": {
+        "singularName": "video-call",
+        "pluralName": "video-calls",
+        "displayName": "Video-Call"
+    },
+    "options": {
+        "draftAndPublish": true
+    },
+    "attributes": {
+        "Title": {
+            "type": "string",
+            "required": true
+        },
+        "Description": {
+            "type": "text"
+        },
+        "Statu": {
+            "type": "enumeration",
+            "enum": [
+                "scheduled",
+                "active",
+                "ended"
+            ],
+            "default": "scheduled"
+        },
+        "StartTime": {
+            "type": "datetime"
+        },
+        "EndTime": {
+            "type": "datetime"
+        },
+        "MaxParticipants": {
+            "type": "integer"
+        },
+        "IsPrivate": {
+            "type": "boolean",
+            "default": false
+        },
+        "AccessCode": {
+            "type": "string"
+        },
+        "RecordingUrl": {
+            "type": "string"
+        },
+        "admin_user": {
+            "type": "relation",
+            "relation": "oneToOne",
+            "target": "admin::user"
+        },
+        "community": {
+            "type": "relation",
+            "relation": "oneToOne",
+            "target": "api::community.community",
+            "inversedBy": "video_call"
+        },
+        "users_permissions_users": {
+            "type": "relation",
+            "relation": "oneToMany",
+            "target": "plugin::users-permissions.user",
+            "mappedBy": "video_call"
+        }
+    }
+}

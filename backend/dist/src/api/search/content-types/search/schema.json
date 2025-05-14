@@ -1,0 +1,18 @@
+{
+    "kind": "collectionType",
+    "collectionName": "searches",
+    "info": {
+        "singularName": "search",
+        "pluralName": "searches",
+        "displayName": "search"
+    },
+    "options": {
+        "draftAndPublish": true
+    },
+    "attributes": {
+        "query": {
+            "type": "string",
+            "required": true
+        }
+    }
+}

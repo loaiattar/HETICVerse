@@ -1,0 +1,52 @@
+{
+    "kind": "collectionType",
+    "collectionName": "join_requests",
+    "info": {
+        "singularName": "join-request",
+        "pluralName": "join-requests",
+        "displayName": "Join-Request"
+    },
+    "options": {
+        "draftAndPublish": true
+    },
+    "attributes": {
+        "statu": {
+            "type": "enumeration",
+            "enum": [
+                "pending",
+                "approved",
+                "rejected"
+            ],
+            "default": "pending"
+        },
+        "requestDate": {
+            "type": "date",
+            "required": true
+        },
+        "responseDate": {
+            "type": "date"
+        },
+        "message": {
+            "type": "text"
+        },
+        "responseMessage": {
+            "type": "string"
+        },
+        "users_permissions_user": {
+            "type": "relation",
+            "relation": "oneToOne",
+            "target": "plugin::users-permissions.user"
+        },
+        "admin_user": {
+            "type": "relation",
+            "relation": "oneToOne",
+            "target": "admin::user"
+        },
+        "community": {
+            "type": "relation",
+            "relation": "oneToOne",
+            "target": "api::community.community",
+            "inversedBy": "join_request"
+        }
+    }
+}

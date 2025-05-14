@@ -1,0 +1,146 @@
+{
+    "kind": "collectionType",
+    "collectionName": "up_users",
+    "info": {
+        "name": "user",
+        "description": "",
+        "singularName": "user",
+        "pluralName": "users",
+        "displayName": "User"
+    },
+    "options": {
+        "draftAndPublish": false
+    },
+    "attributes": {
+        "username": {
+            "type": "string",
+            "minLength": 3,
+            "unique": true,
+            "configurable": false,
+            "required": true
+        },
+        "email": {
+            "type": "email",
+            "minLength": 6,
+            "configurable": false,
+            "required": true
+        },
+        "provider": {
+            "type": "string",
+            "configurable": false
+        },
+        "password": {
+            "type": "password",
+            "minLength": 6,
+            "configurable": false,
+            "private": true,
+            "searchable": false
+        },
+        "resetPasswordToken": {
+            "type": "string",
+            "configurable": false,
+            "private": true,
+            "searchable": false
+        },
+        "confirmationToken": {
+            "type": "string",
+            "configurable": false,
+            "private": true,
+            "searchable": false
+        },
+        "confirmed": {
+            "type": "boolean",
+            "default": false,
+            "configurable": false
+        },
+        "blocked": {
+            "type": "boolean",
+            "default": false,
+            "configurable": false
+        },
+        "role": {
+            "type": "relation",
+            "relation": "manyToOne",
+            "target": "plugin::users-permissions.role",
+            "inversedBy": "users",
+            "configurable": false
+        },
+        "community_members": {
+            "type": "relation",
+            "relation": "oneToMany",
+            "target": "api::community-member.community-member"
+        },
+        "community_invitations": {
+            "type": "relation",
+            "relation": "oneToMany",
+            "target": "api::community-invitation.community-invitation"
+        },
+        "communities": {
+            "type": "relation",
+            "relation": "oneToMany",
+            "target": "api::community.community"
+        },
+        "notification": {
+            "type": "relation",
+            "relation": "oneToOne",
+            "target": "api::notification.notification",
+            "mappedBy": "users_permissions_user"
+        },
+        "chat_rooms": {
+            "type": "relation",
+            "relation": "oneToMany",
+            "target": "api::chat-room.chat-room",
+            "mappedBy": "user"
+        },
+        "follows": {
+            "type": "relation",
+            "relation": "oneToMany",
+            "target": "api::follow.follow"
+        },
+        "bookmarks": {
+            "type": "relation",
+            "relation": "oneToMany",
+            "target": "api::bookmark.bookmark"
+        },
+        "join_requests": {
+            "type": "relation",
+            "relation": "oneToMany",
+            "target": "api::join-request.join-request"
+        },
+        "notifications": {
+            "type": "relation",
+            "relation": "oneToMany",
+            "target": "api::notification.notification"
+        },
+        "user_presence": {
+            "type": "relation",
+            "relation": "oneToOne",
+            "target": "api::user-presence.user-presence",
+            "mappedBy": "users_permissions_user"
+        },
+        "notification_preference": {
+            "type": "relation",
+            "relation": "oneToOne",
+            "target": "api::notification-preference.notification-preference",
+            "mappedBy": "user"
+        },
+        "video_call": {
+            "type": "relation",
+            "relation": "manyToOne",
+            "target": "api::video-call.video-call",
+            "inversedBy": "users_permissions_users"
+        },
+        "comments": {
+            "type": "relation",
+            "relation": "oneToMany",
+            "target": "api::comment.comment",
+            "mappedBy": "user"
+        },
+        "posts": {
+            "type": "relation",
+            "relation": "oneToMany",
+            "target": "api::post.post",
+            "mappedBy": "user"
+        }
+    }
+}

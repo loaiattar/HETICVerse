@@ -1,0 +1,51 @@
+{
+    "kind": "collectionType",
+    "collectionName": "community_members",
+    "info": {
+        "singularName": "community-member",
+        "pluralName": "community-members",
+        "displayName": "Community-Member",
+        "description": ""
+    },
+    "options": {
+        "draftAndPublish": true
+    },
+    "attributes": {
+        "statu": {
+            "type": "enumeration",
+            "enum": [
+                "active",
+                "panned",
+                "muted"
+            ],
+            "default": "active "
+        },
+        "Role": {
+            "type": "enumeration",
+            "enum": [
+                "member",
+                "moderator",
+                "admin"
+            ],
+            "default": "member"
+        },
+        "since": {
+            "type": "date",
+            "required": true
+        },
+        "lastActive": {
+            "type": "date"
+        },
+        "users_permissions_user": {
+            "type": "relation",
+            "relation": "oneToOne",
+            "target": "plugin::users-permissions.user"
+        },
+        "community": {
+            "type": "relation",
+            "relation": "manyToOne",
+            "target": "api::community.community",
+            "inversedBy": "community_members"
+        }
+    }
+}

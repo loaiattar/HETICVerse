@@ -1,0 +1,31 @@
+{
+    "kind": "collectionType",
+    "collectionName": "bookmarks",
+    "info": {
+        "singularName": "bookmark",
+        "pluralName": "bookmarks",
+        "displayName": "Bookmark"
+    },
+    "options": {
+        "draftAndPublish": true
+    },
+    "attributes": {
+        "date": {
+            "required": true,
+            "type": "date"
+        },
+        "notes": {
+            "type": "text"
+        },
+        "users_permissions_user": {
+            "type": "relation",
+            "relation": "oneToOne",
+            "target": "plugin::users-permissions.user"
+        },
+        "post": {
+            "type": "relation",
+            "relation": "oneToOne",
+            "target": "api::post.post"
+        }
+    }
+}

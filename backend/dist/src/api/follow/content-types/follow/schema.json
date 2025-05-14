@@ -1,0 +1,36 @@
+{
+    "kind": "collectionType",
+    "collectionName": "follows",
+    "info": {
+        "singularName": "follow",
+        "pluralName": "follows",
+        "displayName": "Follow"
+    },
+    "options": {
+        "draftAndPublish": true
+    },
+    "attributes": {
+        "date": {
+            "required": true,
+            "type": "date"
+        },
+        "statu": {
+            "type": "enumeration",
+            "enum": [
+                "active",
+                "blocked"
+            ],
+            "default": "active"
+        },
+        "users_permissions_user": {
+            "type": "relation",
+            "relation": "oneToOne",
+            "target": "plugin::users-permissions.user"
+        },
+        "admin_user": {
+            "type": "relation",
+            "relation": "oneToOne",
+            "target": "admin::user"
+        }
+    }
+}
