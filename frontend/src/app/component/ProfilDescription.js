@@ -14,8 +14,8 @@ export default function ProfilDescription() {
           A Data Analyst of I don't know what. Terrible sense of humor, terrible opinions.
         </p>
         <div className="flex justify-between mt-4">
-            <span className="text-gray-400">1.2K posts</span>
-            <span className="text-gray-400">1.6K Online</span>
+            <span className="text-gray-400">134 posts</span>
+            <span className="text-gray-400">1.6K follower</span>
         </div>
       </div>
     );
