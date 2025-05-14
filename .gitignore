@@ -1,7 +1,6 @@
 ############################
 # OS X
 ############################
-
 .DS_Store
 .AppleDouble
 .LSOverride
@@ -10,97 +9,102 @@ Icon
 .Trashes
 ._*
 
-
 ############################
 # Linux
 ############################
-
 *~
-
 
 ############################
 # Windows
 ############################
-
 Thumbs.db
 ehthumbs.db
 Desktop.ini
 $RECYCLE.BIN/
+
+############################
+# Archives and packages
+############################
+*.7z
+*.zip
+*.tar
+*.gz
+*.rar
+*.dmg
+*.iso
 *.cab
 *.msi
 *.msm
 *.msp
-
-
-############################
-# Packages
-############################
-
-*.7z
-*.csv
-*.dat
-*.dmg
-*.gz
-*.iso
 *.jar
-*.rar
-*.tar
-*.zip
 *.com
+
+############################
+# Compiled / Binary files
+############################
 *.class
 *.dll
 *.exe
 *.o
-*.seed
 *.so
 *.swo
 *.swp
 *.swn
 *.swm
 *.out
+*.seed
 *.pid
 
-
 ############################
-# Logs and databases
+# Logs and Databases
 ############################
-
-.tmp
 *.log
 *.sql
 *.sqlite
 *.sqlite3
-
-
-############################
-# Misc.
-############################
-
-*#
-ssl
-.idea
-nbproject
-public/uploads/*
-!public/uploads/.gitkeep
-.tsbuildinfo
-.eslintcache
+.tmp
 
 ############################
 # Node.js
 ############################
-
+node_modules/
+node_modules/*    
+backend/node_modules/
 lib-cov
 lcov.info
 pids
 logs
 results
-node_modules
 .node_history
+
+############################
+# Environment & config
+############################
+.env
+.tsbuildinfo
+.eslintcache
+
+############################
+# Strapi specific
+############################
+.cache/
+.build/
+dist/
+.strapi/
+exports/
+.strapi-updater.json
+.strapi-cloud.json
+license.txt
+
+############################
+# Uploads
+############################
+public/uploads/*
+!public/uploads/.gitkeep
 
 ############################
 # Package managers
 ############################
-
 .yarn/*
 !.yarn/cache
 !.yarn/unplugged
@@ -114,20 +118,13 @@ yarn-error.log
 ############################
 # Tests
 ############################
-
-coverage
+coverage/
 
 ############################
-# Strapi
+# IDEs and Misc
 ############################
-
-.env
-license.txt
-exports
-.strapi
-dist
-build
-.strapi-updater.json
-.strapi-cloud.json
-node_modules
-node_modules
+.vscode/
+.idea/
+nbproject/
+ssl
+*#
