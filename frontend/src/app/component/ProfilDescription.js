@@ -11,7 +11,7 @@ export default function ProfilDescription() {
           </button>
         </div>
         <p className="text-gray-400 mt-2">
-          A Data Analyst of I don't know what. Terrible sense of humor, terrible opinions and Gay af.
+          A Data Analyst of I don't know what. Terrible sense of humor, terrible opinions.
         </p>
         <div className="flex justify-between mt-4">
             <span className="text-gray-400">1.2K posts</span>
