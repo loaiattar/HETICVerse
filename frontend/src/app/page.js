@@ -82,10 +82,31 @@ export default function RegisterPage() {
 
             <button
               type="submit"
-              className="w-full flex justify-center py-2 text-white rounded-md border border-[#3FDEE1] hover:bg-[#3FDEE1]/10 transition duration-300"
+              className="w-full flex justify-center py-2 text-white rounded-lg bg-[#333D42] hover:bg-[#3FDEE1]/10 transition duration-300 shadow-[0_0px_8px_0px_rgba(63,222,225,0.4)] shadow-[#3FDEE1]/100"
             >
               S&apos;inscrire
             </button>
+
+            <div className='flex flex-row items-center justify-center w-full'>
+              <div className='h-px w-full bg-[#C7C7C7]'></div>
+              <p className='mr-5 ml-5'>ou</p>
+              <div className='h-px w-full bg-[#C7C7C7]'></div>
+            </div>
+
+            <button
+              type="submit"
+              className="w-full flex justify-center py-2 text-white rounded-lg bg-[#333D42] hover:bg-[#3FDEE1]/10 transition duration-300 shadow-[0_0px_8px_0px_rgba(63,222,225,0.4)] shadow-[#3FDEE1]/100"
+            >
+              Connect with Google
+            </button>
+
+            <button
+              type="submit"
+              className="w-full flex justify-center py-2 text-white rounded-lg bg-[#333D42] hover:bg-[#3FDEE1]/10 transition duration-300 shadow-[0_0px_8px_0px_rgba(63,222,225,0.4)] shadow-[#3FDEE1]/100"
+            >
+              Connect with GitHub
+            </button>
+
           </form>
 
           {error && <p className="text-red-400 text-sm mt-4 text-center">{error}</p>}
