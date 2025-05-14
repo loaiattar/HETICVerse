@@ -1,136 +1,129 @@
 'use client'
 
 import React, { useState, useEffect } from 'react'
-import axios from 'axios'
+import { postsApi } from '../../utils/api'
 
-export default function PostCard({ postId }) {
+export default function PostCard({ post }) {
   const [activeButton, setActiveButton] = useState(null)
   const [voteCount, setVoteCount] = useState(0)
-  const [postData, setPostData] = useState(null)
 
   useEffect(() => {
-    const fetchPost = async () => {
-      try {
-        const response = await axios.get(`http://localhost:1337/api/posts/${postId}?populate=*`)
-        if (response.status === 200) {
-          setPostData(response.data.data)
-          setVoteCount(response.data.data.attributes.vote || 0)
-        }
-      } catch (error) {
-        console.error('Error fetching post:', error)
-      }
+    if (post) {
+      console.log('Post data:', post) // Debug post data
+      setVoteCount(post.attributes.vote || 0)
     }
+  }, [post])
 
-    if (postId) {
-      fetchPost()
-    }
-  }, [postId])
-
-  const handleClick = async (button) => {
+  const handleVote = async (button) => {
     try {
       if (button === 'blue') {
         const newVoteCount = activeButton === button ? voteCount - 1 : voteCount + 1
-        const response = await axios.put(`http://localhost:1337/api/posts/${postId}`, {
-          data: {
-            vote: newVoteCount
-          }
-        }, {
-          headers: {
-            'Content-Type': 'application/json',
-          }
+        
+        const response = await postsApi.updatePost(post.id, {
+          vote: newVoteCount
         })
 
-        if (response.status === 200) {
+        console.log('Vote response:', response) // Debug vote response
+
+        if (response.data) {
           setActiveButton(prev => (prev === button ? null : button))
           setVoteCount(newVoteCount)
         }
       }
     } catch (error) {
-      console.error('Error updating post:', error)
+      console.error('Vote error details:', {
+        message: error.message,
+        response: error.response?.data,
+        status: error.response?.status
+      }) // Detailed error logging
     }
   }
 
-  const getShadowClass = () => {
-    if (activeButton === 'blue' || activeButton === 'blueForce') return 'shadow-[0_1px_7px_0px_rgba(63,222,225,0.4)] shadow-[#3FDEE1]'
-    if (activeButton === 'red') return 'shadow-[0_1px_7px_0px_rgba(63,222,225,0.4)] shadow-[#F13636]'
-    return ''
-  }
-
-  if (!postData) {
+  if (!post) {
     return <div className="text-gray-400">Loading...</div>
   }
 
-  const { attributes } = postData
+  const { attributes } = post
+  console.log('Post attributes:', attributes) // Debug attributes
+
   const communityName = attributes.community?.data?.attributes?.name || 'R/RandomCommunity'
   const username = attributes.user?.data?.attributes?.username || 'Anonymous'
   const createdAt = new Date(attributes.createdAt).toLocaleDateString()
-  const imageUrl = attributes.image?.data?.attributes?.url
+  const imageUrl = attributes.image?.data?.[0]?.attributes?.url
+  const content = attributes.content?.[0]?.children?.[0]?.text || attributes.content || ''
 
   return (
-    <div className="max-w-3xl mx-auto py-6 px-4">
-      <div className="rounded-md overflow-hidden hover:bg-[#181C1F]">
-        <div className="p-4">
-          <div className="flex items-center mb-2">
-            <div className="w-6 h-6 bg-gray-600 rounded-full mr-2"></div>
-            <span className="text-sm text-gray-400">
-              {communityName}
-            </span>
-            <span className="mx-1 text-sm text-gray-500">•</span>
-            <span className="text-sm text-gray-500">
-              {username}
-            </span>
-            <span className="mx-1 text-sm text-gray-500">•</span>
-            <span className="text-sm text-gray-500">
-              {createdAt}
-            </span>
-            
-            <div className="flex item-center ml-auto">
-              <button className="px-3 py-1 bg-[#105BCA] rounded-full text-sm font-medium hover:bg-[#1B489D]">
-                Join
-              </button>
-            </div>
+    <div className="bg-[#2B3236] rounded-lg shadow-lg overflow-hidden mb-4">
+      <div className="p-4">
+        {/* Header */}
+        <div className="flex items-center mb-2">
+          <div className="w-6 h-6 bg-gray-600 rounded-full mr-2"></div>
+          <span className="text-sm text-gray-400">{communityName}</span>
+          <span className="mx-1 text-sm text-gray-500">•</span>
+          <span className="text-sm text-gray-500">Posted by {username}</span>
+          <span className="mx-1 text-sm text-gray-500">•</span>
+          <span className="text-sm text-gray-500">{createdAt}</span>
+        </div>
+
+        {/* Content */}
+        <h2 className="text-xl font-medium mb-2 text-white">{attributes.title}</h2>
+        <div className="text-sm text-gray-300 mb-4">
+          {content}
+        </div>
+
+        {/* Image */}
+        {imageUrl && (
+          <div className="mb-4">
+            <img 
+              src={`http://localhost:1337${imageUrl}`} 
+              alt={attributes.title}
+              className="w-full h-auto rounded-lg"
+            />
           </div>
-          
-          <h2 className="text-xl font-medium mb-2">{attributes.title}</h2>
-          <p className="text-sm text-gray-300 mb-4">
-            {attributes.content}
-          </p>
-          
-          {imageUrl && (
-            <div className="bg-gray-400 w-full h-120 rounded-2xl mb-4">
-              <img 
-                src={`http://localhost:1337${imageUrl}`} 
-                alt={attributes.title}
-                className="w-full h-full object-cover rounded-2xl"
-              />
-            </div>
-          )}
-          
-          <div className="flex items-center space-x-4">
+        )}
+
+        {/* Actions */}
+        <div className="flex items-center space-x-4">
+          {/* Vote buttons */}
+          <div className="flex items-center space-x-2">
             <button 
-              onClick={() => handleClick('blue')}
-              className={`flex items-center space-x-1 text-white bg-[#2B3236] hover:bg-[#333D42] w-min h-8 px-3 py-5 gap-1 rounded-full ${activeButton === 'blue' ? 'text-[#3FDEE1]' : ''}`}
+              onClick={() => handleVote('blue')}
+              className={`p-1 rounded ${activeButton === 'blue' ? 'text-[#3FDEE1]' : ''}`}
             >
-              <svg xmlns="http://www.w3.org/2000/svg" height="24px" viewBox="0 -960 960 960" width="24px" fill="currentColor">
-                <path d="M440-440H200v-80h240v-240h80v240h240v80H520v240h-80v-240Z"/>
+              <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                <path d="M12 4L3 15H21L12 4Z" fill="currentColor"/>
               </svg>
-              <span className="text-sm font-medium">{voteCount}</span>
             </button>
-            
-            <button className="flex items-center space-x-1 text-white bg-[#2B3236] hover:bg-[#333D42] w-min h-8 px-3 py-5 gap-1 rounded-full">
-              <svg xmlns="http://www.w3.org/2000/svg" height="24px" viewBox="0 -960 960 960" width="24px" fill="currentColor">
-                <path d="M240-400h480v-80H240v80Zm0-120h480v-80H240v80Zm0-120h480v-80H240v80ZM880-80 720-240H160q-33 0-56.5-23.5T80-320v-480q0-33 23.5-56.5T160-880h640q33 0 56.5 23.5T880-800v720ZM160-320h594l46 45v-525H160v480Zm0 0v-480 480Z"/>
+            <span className="text-white">{voteCount}</span>
+            <button 
+              onClick={() => handleVote('red')}
+              className={`p-1 rounded ${activeButton === 'red' ? 'text-red-500' : ''}`}
+            >
+              <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                <path d="M12 20L3 9H21L12 20Z" fill="currentColor"/>
               </svg>
-              <span className="text-sm font-medium">Comment</span>
-            </button>
-            
-            <button className="flex items-center space-x-1 text-white bg-[#2B3236] hover:bg-[#333D42] w-min h-8 px-3 py-5 gap-1 rounded-full">
-              <svg xmlns="http://www.w3.org/2000/svg" height="24px" viewBox="0 -960 960 960" width="24px" fill="currentColor">
-                <path d="M680-80q-50 0-85-35t-35-85q0-6 3-28L282-392q-16 15-37 23.5t-45 8.5q-50 0-85-35t-35-85q0-50 35-85t85-35q24 0 45 8.5t37 23.5l281-164q-2-7-2.5-13.5T560-760q0-50 35-85t85-35q50 0 85 35t35 85q0 50-35 85t-85 35q-24 0-45-8.5T598-672L317-508q2 7 2.5 13.5t.5 14.5q0 8-.5 14.5T317-452l281 164q16-15 37-23.5t45-8.5q50 0 85 35t35 85q0 50-35 85t-85 35Z"/>
-              </svg>
-              <span className="text-sm">Share</span>
             </button>
           </div>
+
+          {/* Comments */}
+          <button className="flex items-center space-x-1">
+            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+              <path d="M21 15C21 15.5304 20.7893 16.0391 20.4142 16.4142C20.0391 16.7893 19.5304 17 19 17H7L3 21V5C3 4.46957 3.21071 3.96086 3.58579 3.58579C3.96086 3.21071 4.46957 3 5 3H19C19.5304 3 20.0391 3.21071 20.4142 3.58579C20.7893 3.96086 21 4.46957 21 5V15Z" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
+            </svg>
+            <span>Comments</span>
+          </button>
+
+          {/* Share */}
+          <button className="flex items-center space-x-1">
+            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+              <path d="M18 8C19.6569 8 21 6.65685 21 5C21 3.34315 19.6569 2 18 2C16.3431 2 15 3.34315 15 5C15 6.65685 16.3431 8 18 8Z" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
+              <path d="M6 15C7.65685 15 9 13.6569 9 12C9 10.3431 7.65685 9 6 9C4.34315 9 3 10.3431 3 12C3 13.6569 4.34315 15 6 15Z" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
+              <path d="M18 22C19.6569 22 21 20.6569 21 19C21 17.3431 19.6569 16 18 16C16.3431 16 15 17.3431 15 19C15 20.6569 16.3431 22 18 22Z" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
+              <path d="M8.59 13.51L15.42 17.49" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
+              <path d="M15.41 6.51L8.59 10.49" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
+            </svg>
+            <span>Share</span>
+          </button>
         </div>
       </div>
     </div>

@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import axios from 'axios';
+import { communitiesApi } from '../../utils/api';
 
 export default function SelectCommunityButton({ onSelect, selectedCommunity }) {
   const [isOpen, setIsOpen] = useState(false);
@@ -10,37 +10,26 @@ export default function SelectCommunityButton({ onSelect, selectedCommunity }) {
   useEffect(() => {
     const fetchCommunities = async () => {
       try {
-        const token = localStorage.getItem('jwt');
-
-        if (!token) {
-          setError('Non authentifié. Veuillez vous connecter.');
-          setLoading(false);
-          return;
-        }
-
-        const response = await axios.get('http://127.0.0.1:1337/api/communities?populate=*', {
-          headers: {
-            Authorization: `Bearer ${token}`,
-            'Content-Type': 'application/json',
-          }
+        const response = await communitiesApi.getAllCommunities({
+          populate: '*'
         });
 
-        if (response.data && response.data.data) {
-          const formattedCommunities = response.data.data.map(community => ({
+        if (response && response.data) {
+          const formattedCommunities = response.data.map(community => ({
             id: community.id,
-            name: community.name || 'Sans nom',
-            members: `${community.memberCount || 0} membres`,
-            documentId: community.documentId
+            name: community.attributes.name || 'Unnamed',
+            members: `${community.attributes.memberCount || 0} members`,
+            documentId: community.attributes.documentId
           }));
           setCommunities(formattedCommunities);
         }
       } catch (err) {
         if (err.response?.status === 403) {
-          setError('Accès refusé. Veuillez vous connecter ou vérifier les permissions.');
+          setError('Access denied. Please check your login status or permissions.');
         } else if (err.response) {
-          setError(`Erreur ${err.response.status}: ${err.response.data.error?.message || 'Erreur lors du chargement des communautés'}`);
+          setError(`Error ${err.response.status}: ${err.response.data.error?.message || 'Error loading communities'}`);
         } else {
-          setError('Erreur de connexion au serveur');
+          setError('Server connection error');
         }
       } finally {
         setLoading(false);
@@ -78,23 +67,23 @@ export default function SelectCommunityButton({ onSelect, selectedCommunity }) {
       {isOpen && (
         <div className="absolute z-10 bg-[#2B3236] rounded-md shadow-lg mt-2 w-full max-h-60 overflow-y-auto">
           {loading ? (
-            <div className="px-4 py-2 text-white text-sm">Chargement...</div>
+            <div className="px-4 py-2 text-white text-sm">Loading...</div>
           ) : error ? (
             <div className="px-4 py-2 text-red-400 text-sm">
               {error}
               {error.includes('403') && (
                 <div className="mt-2 text-xs">
-                  <p>Pour résoudre ce problème :</p>
+                  <p>To resolve this issue:</p>
                   <ol className="list-decimal list-inside mt-1">
-                    <li>Vérifiez que vous êtes bien connecté</li>
-                    <li>Vérifiez les permissions dans Strapi pour le rôle "Authenticated"</li>
-                    <li>Si le problème persiste, essayez de vous déconnecter et reconnecter</li>
+                    <li>Verify that you are logged in</li>
+                    <li>Check permissions in Strapi for the "Authenticated" role</li>
+                    <li>If the problem persists, try logging out and back in</li>
                   </ol>
                 </div>
               )}
             </div>
           ) : communities.length === 0 ? (
-            <div className="px-4 py-2 text-white text-sm">Aucune communauté disponible</div>
+            <div className="px-4 py-2 text-white text-sm">No communities available</div>
           ) : (
             communities.map((community) => (
               <div 
