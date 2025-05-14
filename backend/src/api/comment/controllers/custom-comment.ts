@@ -1,6 +1,3 @@
-// src/api/comment/controllers/custom-comment.ts
-
-
 
 // Define interfaces for query parameters
 interface CommentQueryFilters {
