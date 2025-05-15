@@ -16,10 +16,15 @@
       "static/chunks/main-app.js",
       "static/chunks/app/home/page.js"
     ],
-    "/login/page": [
+    "/create-post/page": [
       "static/chunks/webpack.js",
       "static/chunks/main-app.js",
-      "static/chunks/app/login/page.js"
+      "static/chunks/app/create-post/page.js"
+    ],
+    "/create-community/page": [
+      "static/chunks/webpack.js",
+      "static/chunks/main-app.js",
+      "static/chunks/app/create-community/page.js"
     ]
   }
 }

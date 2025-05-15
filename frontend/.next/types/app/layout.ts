@@ -1,4 +1,4 @@
-// File: /Users/nm.mp4/Desktop/HETICV/HETICVerse/frontend/src/app/layout.js
+// File: /Users/nm.mp4/Desktop/hv/HETICVerse/frontend/src/app/layout.js
 import * as entry from '../../../src/app/layout.js'
 import type { ResolvingMetadata, ResolvingViewport } from 'next/dist/lib/metadata/types/metadata-interface.js'
 

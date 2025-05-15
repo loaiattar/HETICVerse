@@ -106,7 +106,7 @@ export default function Home() {
           </div>
           
           <div className="flex items-center space-x-4">
-            <a href="create-post" className="flex flex-row justify-center items-center gap-1 px-2 py-2 rounded-full text-sm font-medium hover:bg-[#333D42]">
+            <a href="create" className="flex flex-row justify-center items-center gap-1 px-2 py-2 rounded-full text-sm font-medium hover:bg-[#333D42]">
               <svg xmlns="http://www.w3.org/2000/svg" height="24px" viewBox="0 -960 960 960" width="24px" fill="#FFFFFF"><path d="M440-440H200v-80h240v-240h80v240h240v80H520v240h-80v-240Z"/></svg>
               Create
             </a>

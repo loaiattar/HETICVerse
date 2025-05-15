@@ -7,9 +7,14 @@ import PostCard from '../component/PostCard'
 
 export default function Home() {
   const [selectedButton, setSelectedButton] = useState('home')
+  const [isPanelOpen, setIsPanelOpen] = useState(false)
 
   const handleButtonClick = (button) => {
     setSelectedButton(button)
+  }
+
+  const togglePanel = () => {
+    setIsPanelOpen(!isPanelOpen)
   }
 
   return (
@@ -30,7 +35,7 @@ export default function Home() {
               <svg xmlns="http://www.w3.org/2000/svg" fill='white' viewBox="0 0 48 48" width="24px" height="24px"><path d="M39.5,43h-9c-1.381,0-2.5-1.119-2.5-2.5v-9c0-1.105-0.895-2-2-2h-4c-1.105,0-2,0.895-2,2v9c0,1.381-1.119,2.5-2.5,2.5h-9	C7.119,43,6,41.881,6,40.5V21.413c0-2.299,1.054-4.471,2.859-5.893L23.071,4.321c0.545-0.428,1.313-0.428,1.857,0L39.142,15.52	C40.947,16.942,42,19.113,42,21.411V40.5C42,41.881,40.881,43,39.5,43z"/></svg>
 
               ) : (
-                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                <svg width="24" height="24" viewBox="0 0 24 24" fill="white" xmlns="http://www.w3.org/2000/svg">
                   <path d="M11.9756 1.99999C11.8157 2.00545 11.6617 2.06191 11.5361 2.16113L4.42968 7.75976C3.52773 8.47057 3 9.55675 3 10.7051V20.25C3 20.9318 3.5682 21.5 4.25 21.5H9.25C9.93179 21.5 10.5 20.9318 10.5 20.25V15.25C10.5 15.1025 10.6025 15 10.75 15H13.25C13.3975 15 13.5 15.1025 13.5 15.25V20.25C13.5 20.9318 14.0682 21.5 14.75 21.5H19.75C20.4318 21.5 21 20.9318 21 20.25V10.7051C21 9.55675 20.4722 8.47058 19.5703 7.75976L12.4639 2.16113C12.3252 2.05157 12.1522 1.9945 11.9756 1.99999ZM12 3.70507L18.6426 8.93847C19.1846 9.36565 19.5 10.0154 19.5 10.7051V20H15V15.25C15 14.2925 14.2075 13.5 13.25 13.5H10.75C9.79252 13.5 9 14.2925 9 15.25V20H4.5V10.7051C4.5 10.0154 4.81537 9.36565 5.35742 8.93847L12 3.70507Z" fill="white"/>
                 </svg>
 
@@ -104,10 +109,17 @@ export default function Home() {
           </div>
           
           <div className="flex items-center space-x-4">
-            <a href="create-post" className="flex flex-row justify-center items-center gap-1 px-2 py-2 rounded-full text-sm font-medium hover:bg-[#333D42]">
+            <button onClick={togglePanel} className="flex flex-row justify-center items-center gap-1 px-2 py-2 rounded-full text-sm font-medium hover:bg-[#333D42]">
               <svg xmlns="http://www.w3.org/2000/svg" height="24px" viewBox="0 -960 960 960" width="24px" fill="#FFFFFF"><path d="M440-440H200v-80h240v-240h80v240h240v80H520v240h-80v-240Z"/></svg>
               Create
-            </a>
+            </button>
+            {isPanelOpen && (
+              <div className="flex flex-col gap-3 absolute top-15 bg-[#2B3236] p-6 rounded-xl text-center">
+                <a href="create-post" className="block text-white hover:bg-[#333D42] rounded-xl">Create post</a>
+                <div className='w-full h-px bg-[#C7C7C7]'></div>
+                <a href="create-community" className="block text-white hover:bg-[#333D42] rounded-xl">Create Community</a>
+              </div>
+            )}
             <button className="p-1">
               <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 17h5l-1.405-1.405A2.032 2.032 0 0118 14.158V11a6.002 6.002 0 00-4-5.659V5a2 2 0 10-4 0v.341C7.67 6.165 6 8.388 6 11v3.159c0 .538-.214 1.055-.595 1.436L4 17h5m6 0v1a3 3 0 11-6 0v-1m6 0H9" />
