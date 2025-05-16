@@ -1,9 +1,8 @@
 'use strict';
-Object.defineProperty(exports, "__esModule", { value: true });
 /**
  * Custom notification routes
  */
-exports.default = {
+module.exports = {
     type: 'content-api',
     routes: [
         // Get current user's notifications
