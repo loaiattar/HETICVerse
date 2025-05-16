@@ -766,36 +766,33 @@ export interface ApiNotificationPreferenceNotificationPreference
   extends Struct.CollectionTypeSchema {
   collectionName: 'notification_preferences';
   info: {
-    displayName: 'Notification-Preference';
+    displayName: 'Notification Preference';
     pluralName: 'notification-preferences';
     singularName: 'notification-preference';
   };
   options: {
-    draftAndPublish: true;
+    draftAndPublish: false;
   };
   attributes: {
     CommentNotifications: Schema.Attribute.Boolean &
       Schema.Attribute.DefaultTo<true>;
     communityNotifications: Schema.Attribute.Boolean &
       Schema.Attribute.DefaultTo<true>;
+    CommunityUpdates: Schema.Attribute.Boolean &
+      Schema.Attribute.DefaultTo<true>;
     createdAt: Schema.Attribute.DateTime;
     createdBy: Schema.Attribute.Relation<'oneToOne', 'admin::user'> &
       Schema.Attribute.Private;
     EmailNotifications: Schema.Attribute.Boolean &
       Schema.Attribute.DefaultTo<true>;
-    followNotifs: Schema.Attribute.Boolean & Schema.Attribute.DefaultTo<true>;
+    JoinRequests: Schema.Attribute.Boolean & Schema.Attribute.DefaultTo<true>;
     locale: Schema.Attribute.String & Schema.Attribute.Private;
     localizations: Schema.Attribute.Relation<
       'oneToMany',
       'api::notification-preference.notification-preference'
     > &
       Schema.Attribute.Private;
-    mentionNotifications: Schema.Attribute.Boolean &
-      Schema.Attribute.DefaultTo<true>;
-    msgsNotifs: Schema.Attribute.Boolean & Schema.Attribute.DefaultTo<true>;
     publishedAt: Schema.Attribute.DateTime;
-    PushNotifications: Schema.Attribute.Boolean &
-      Schema.Attribute.DefaultTo<true>;
     updatedAt: Schema.Attribute.DateTime;
     updatedBy: Schema.Attribute.Relation<'oneToOne', 'admin::user'> &
       Schema.Attribute.Private;

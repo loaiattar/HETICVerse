@@ -4,29 +4,23 @@
     "info": {
         "singularName": "notification-preference",
         "pluralName": "notification-preferences",
-        "displayName": "Notification-Preference"
+        "displayName": "Notification Preference"
     },
     "options": {
-        "draftAndPublish": true
+        "draftAndPublish": false
     },
     "attributes": {
-        "EmailNotifications": {
-            "type": "boolean",
-            "default": true
-        },
-        "PushNotifications": {
-            "type": "boolean",
-            "default": true
+        "user": {
+            "type": "relation",
+            "relation": "oneToOne",
+            "target": "plugin::users-permissions.user",
+            "inversedBy": "notification_preference"
         },
         "CommentNotifications": {
             "type": "boolean",
             "default": true
         },
-        "followNotifs": {
-            "type": "boolean",
-            "default": true
-        },
-        "msgsNotifs": {
+        "EmailNotifications": {
             "type": "boolean",
             "default": true
         },
@@ -34,15 +28,13 @@
             "type": "boolean",
             "default": true
         },
-        "mentionNotifications": {
+        "CommunityUpdates": {
             "type": "boolean",
             "default": true
         },
-        "user": {
-            "type": "relation",
-            "relation": "oneToOne",
-            "target": "plugin::users-permissions.user",
-            "inversedBy": "notification_preference"
+        "JoinRequests": {
+            "type": "boolean",
+            "default": true
         }
     }
 }
