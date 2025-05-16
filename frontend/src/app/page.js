@@ -2,6 +2,7 @@
 
 import axios from 'axios';
 import { useState } from 'react';
+import { useRouter } from 'next/navigation';
 import Header from './component/HeaderLandingPage';
 
 export default function RegisterPage() {
