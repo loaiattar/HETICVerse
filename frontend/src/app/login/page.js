@@ -1,31 +1,41 @@
 'use client';
 
-import axios from 'axios';
 import { useState } from 'react';
 import { useRouter } from 'next/navigation';
 
-export default function LogInPage() {
+export default function LogInPage( ) {
   const router = useRouter();
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [error, setError] = useState('');
   const [success, setSuccess] = useState('');
+  const [loading, setLoading] = useState(false);
 
   const handleSubmit = async (e) => {
     e.preventDefault();
     setError('');
     setSuccess('');
+    setLoading(true);
 
     try {
-      const response = await axios.post('http://localhost:1337/api/auth/local', {
-        identifier: email,
-        password: password,
+      const response = await fetch('http://localhost:1337/api/auth/local', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          identifier: email,
+          password: password,
+        } ),
       });
+            const data = await response.json();
+      
+      if (!response.ok) {
+        throw new Error(data.error?.message || 'Authentication failed');
+      }
 
-      console.log('User profile', response.data.user);
-      console.log('User token', response.data.jwt);
       setSuccess('Connexion réussie !');
-      localStorage.setItem('jwt', response.data.jwt);
+      localStorage.setItem('jwt', data.jwt);
       
       // Redirection vers la page home après 1 seconde
       setTimeout(() => {
@@ -33,7 +43,9 @@ export default function LogInPage() {
       }, 1000);
     } catch (err) {
       setError('Email ou mot de passe incorrect.');
-      console.error(err.response || err);
+      console.error(err);
+    } finally {
+      setLoading(false);
     }
   };
 
@@ -58,6 +70,7 @@ export default function LogInPage() {
             value={email}
             onChange={(e) => setEmail(e.target.value)}
             className="w-full px-4 py-2 rounded-md bg-[#333D42] text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-[#3FDEE1]"
+            required
           />
           <input
             type="password"
@@ -65,13 +78,15 @@ export default function LogInPage() {
             value={password}
             onChange={(e) => setPassword(e.target.value)}
             className="w-full px-4 py-2 rounded-md bg-[#333D42] text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-[#3FDEE1]"
+            required
           />
 
           <button
             type="submit"
+            disabled={loading}
             className="w-full flex justify-center py-2 text-white rounded-md border border-[#3FDEE1] hover:bg-[#3FDEE1]/10 transition duration-300"
           >
-            Se connecter
+            {loading ? 'Connexion en cours...' : 'Se connecter'}
           </button>
         </form>
 

@@ -1,39 +1,61 @@
+'use client';
+
 import axios from 'axios';
 
-const API_URL = 'http://localhost:1337';
+// Create a minimal axios client with no complex error handling
+const createMinimalAxiosClient = () => {
+  // Simple API URL that works in both environments
+  const baseURL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:1337';
+  
+  const instance = axios.create({
+    baseURL,
+    headers: {
+      'Content-Type': 'application/json',
+    },
+  } );
 
-const axiosClient = axios.create({
-  baseURL: API_URL,
-  headers: {
-    'Content-Type': 'application/json',
-  },
-});
+  // Simple request interceptor with minimal error handling
+  instance.interceptors.request.use(
+    (config) => {
+      // Only run on client side
+      if (typeof window !== 'undefined') {
+        try {
+          const token = localStorage.getItem('jwt');
+          if (token) {
+            config.headers.Authorization = `Bearer ${token}`;
+          }
+        } catch (e) {
+          // Silent fail
+        }
+      }
+      return config;
+    },
+    (error) => Promise.reject(error)
+  );
 
-// Intercepteur pour ajouter le token à chaque requête
-axiosClient.interceptors.request.use(
-  (config) => {
-    const token = localStorage.getItem('jwt');
-    if (token) {
-      config.headers.Authorization = `Bearer ${token}`;
+  // Minimal response interceptor
+  instance.interceptors.response.use(
+    (response) => response,
+    (error) => {
+      // Handle auth errors with minimal code
+      if (typeof window !== 'undefined' && 
+          error?.response?.status && 
+          (error.response.status === 401 || error.response.status === 403)) {
+        try {
+          localStorage.removeItem('jwt');
+          window.location.href = '/login';
+        } catch (e) {
+          // Silent fail
+        }
+      }
+      return Promise.reject(error);
     }
-    return config;
-  },
-  (error) => {
-    return Promise.reject(error);
-  }
-);
+  );
 
-// Intercepteur pour gérer les erreurs de réponse
-axiosClient.interceptors.response.use(
-  (response) => response,
-  (error) => {
-    if (error.response?.status === 401 || error.response?.status === 403) {
-      // Gérer l'expiration du token ou les erreurs d'authentification
-      localStorage.removeItem('jwt');
-      window.location.href = '/login';
-    }
-    return Promise.reject(error);
-  }
-);
+  return instance;
+};
+
+// Create the client
+const axiosClient = createMinimalAxiosClient();
 
 export default axiosClient;

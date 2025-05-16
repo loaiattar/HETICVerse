@@ -61,8 +61,16 @@ export const communitiesApi = {
   },
 
   // Créer une nouvelle communauté
-  createCommunity: async (communityData) => {
-    const response = await axiosClient.post('/api/communities', { data: communityData });
+ createCommunity: async (communityData) => {
+    // Make sure we're sending the correct structure
+    const payload = {
+      data: {
+        name: communityData.name,
+        description: communityData.description
+      }
+    };
+    
+    const response = await axiosClient.post('/api/communities', payload);
     return response.data;
   },
 

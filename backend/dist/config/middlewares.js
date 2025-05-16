@@ -1,10 +1,16 @@
-"use strict";
-Object.defineProperty(exports, "__esModule", { value: true });
-exports.default = [
+// backend/config/middlewares.js
+module.exports = [
     'strapi::logger',
     'strapi::errors',
     'strapi::security',
-    'strapi::cors',
+    {
+        name: 'strapi::cors',
+        config: {
+            enabled: true,
+            headers: '*',
+            origin: ['http://localhost:3000', 'http://localhost:1337', '*']
+        }
+    },
     'strapi::poweredBy',
     'strapi::query',
     'strapi::body',
