@@ -593,7 +593,9 @@ export interface ApiCommunityMemberCommunityMember
     Role: Schema.Attribute.Enumeration<['member', 'moderator', 'admin']> &
       Schema.Attribute.DefaultTo<'member'>;
     since: Schema.Attribute.Date & Schema.Attribute.Required;
-    statu: Schema.Attribute.Enumeration<['active', 'panned', 'muted']> &
+    status: Schema.Attribute.Enumeration<
+      ['active', 'banned', 'muted', 'pending']
+    > &
       Schema.Attribute.DefaultTo<'active '>;
     updatedAt: Schema.Attribute.DateTime;
     updatedBy: Schema.Attribute.Relation<'oneToOne', 'admin::user'> &
@@ -821,8 +823,8 @@ export interface ApiNotificationNotification
     createdAt: Schema.Attribute.DateTime;
     createdBy: Schema.Attribute.Relation<'oneToOne', 'admin::user'> &
       Schema.Attribute.Private;
-    Date: Schema.Attribute.Date & Schema.Attribute.Required;
-    Link: Schema.Attribute.String;
+    date: Schema.Attribute.Date & Schema.Attribute.Required;
+    link: Schema.Attribute.String;
     locale: Schema.Attribute.String & Schema.Attribute.Private;
     localizations: Schema.Attribute.Relation<
       'oneToMany',
@@ -830,7 +832,7 @@ export interface ApiNotificationNotification
     > &
       Schema.Attribute.Private;
     publishedAt: Schema.Attribute.DateTime;
-    Read: Schema.Attribute.Boolean & Schema.Attribute.DefaultTo<false>;
+    read: Schema.Attribute.Boolean & Schema.Attribute.DefaultTo<false>;
     type: Schema.Attribute.Enumeration<
       [
         'mention',

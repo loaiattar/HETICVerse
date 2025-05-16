@@ -11,12 +11,13 @@
     "draftAndPublish": true
   },
   "attributes": {
-    "statu": {
+    "status": {
       "type": "enumeration",
       "enum": [
         "active",
-        "panned",
-        "muted"
+        "banned",
+        "muted",
+        "pending"
       ],
       "default": "active "
     },

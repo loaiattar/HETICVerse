@@ -4,7 +4,8 @@
  * Custom notification routes
  */
 
-export default {
+module.exports = {  
+  type: 'content-api',
   routes: [
     // Get current user's notifications
     {
@@ -12,9 +13,12 @@ export default {
       path: '/notifications',
       handler: 'custom-notification.getMyNotifications',
       config: {
+        auth: {
+          required: true
+        },
         policies: [],
         middlewares: [],
-      },
+      }
     },
     // Mark notification as read
     {
@@ -22,6 +26,9 @@ export default {
       path: '/notifications/:id/read',
       handler: 'custom-notification.markAsRead',
       config: {
+        auth: {
+          required: true
+        },
         policies: [],
         middlewares: [],
       },
@@ -32,6 +39,9 @@ export default {
       path: '/notifications/read-all',
       handler: 'custom-notification.markAllAsRead',
       config: {
+        auth: {
+          required: true
+        },
         policies: [],
         middlewares: [],
       },
@@ -42,6 +52,9 @@ export default {
       path: '/notifications/:id',
       handler: 'custom-notification.deleteNotification',
       config: {
+        auth: {
+          required: true
+        },
         policies: [],
         middlewares: [],
       },
@@ -52,6 +65,9 @@ export default {
       path: '/notifications/delete-read',
       handler: 'custom-notification.deleteAllRead',
       config: {
+        auth: {
+          required: true
+        },
         policies: [],
         middlewares: [],
       },
@@ -62,6 +78,9 @@ export default {
       path: '/notification-preferences',
       handler: 'custom-notification.getPreferences',
       config: {
+        auth: {
+          required: true
+        },
         policies: [],
         middlewares: [],
       },
@@ -72,6 +91,9 @@ export default {
       path: '/notification-preferences',
       handler: 'custom-notification.updatePreferences',
       config: {
+        auth: {
+          required: true
+        },
         policies: [],
         middlewares: [],
       },
@@ -82,6 +104,9 @@ export default {
       path: '/notifications/count',
       handler: 'custom-notification.getCount',
       config: {
+        auth: {
+          required: true
+        },
         policies: [],
         middlewares: [],
       },

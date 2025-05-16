@@ -9,9 +9,13 @@ interface NotificationQueryParams {
   page?: string;
   type?: string;
   read?: string;
+  user?: string;
+  recipient?: string;
+  sender?: string;
+  content?: string;
 }
 
-export default {
+module.exports = {
   /**
    * Get current user's notifications
    */

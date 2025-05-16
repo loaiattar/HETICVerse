@@ -26,15 +26,15 @@
             "type": "string",
             "required": true
         },
-        "Read": {
+        "read": {
             "type": "boolean",
             "default": false
         },
-        "Date": {
+        "date": {
             "type": "date",
             "required": true
         },
-        "Link": {
+        "link": {
             "type": "string"
         },
         "users_permissions_user": {

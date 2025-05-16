@@ -4,6 +4,7 @@ Object.defineProperty(exports, "__esModule", { value: true });
  * Custom notification routes
  */
 exports.default = {
+    type: 'content-api',
     routes: [
         // Get current user's notifications
         {
@@ -11,9 +12,12 @@ exports.default = {
             path: '/notifications',
             handler: 'custom-notification.getMyNotifications',
             config: {
+                auth: {
+                    required: true
+                },
                 policies: [],
                 middlewares: [],
-            },
+            }
         },
         // Mark notification as read
         {
@@ -21,6 +25,9 @@ exports.default = {
             path: '/notifications/:id/read',
             handler: 'custom-notification.markAsRead',
             config: {
+                auth: {
+                    required: true
+                },
                 policies: [],
                 middlewares: [],
             },
@@ -31,6 +38,9 @@ exports.default = {
             path: '/notifications/read-all',
             handler: 'custom-notification.markAllAsRead',
             config: {
+                auth: {
+                    required: true
+                },
                 policies: [],
                 middlewares: [],
             },
@@ -41,6 +51,9 @@ exports.default = {
             path: '/notifications/:id',
             handler: 'custom-notification.deleteNotification',
             config: {
+                auth: {
+                    required: true
+                },
                 policies: [],
                 middlewares: [],
             },
@@ -51,6 +64,9 @@ exports.default = {
             path: '/notifications/delete-read',
             handler: 'custom-notification.deleteAllRead',
             config: {
+                auth: {
+                    required: true
+                },
                 policies: [],
                 middlewares: [],
             },
@@ -61,6 +77,9 @@ exports.default = {
             path: '/notification-preferences',
             handler: 'custom-notification.getPreferences',
             config: {
+                auth: {
+                    required: true
+                },
                 policies: [],
                 middlewares: [],
             },
@@ -71,6 +90,9 @@ exports.default = {
             path: '/notification-preferences',
             handler: 'custom-notification.updatePreferences',
             config: {
+                auth: {
+                    required: true
+                },
                 policies: [],
                 middlewares: [],
             },
@@ -81,6 +103,9 @@ exports.default = {
             path: '/notifications/count',
             handler: 'custom-notification.getCount',
             config: {
+                auth: {
+                    required: true
+                },
                 policies: [],
                 middlewares: [],
             },

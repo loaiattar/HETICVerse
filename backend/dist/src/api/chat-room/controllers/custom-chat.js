@@ -16,7 +16,7 @@ exports.default = {
         }
         try {
             // Check if recipient exists
-            const recipient = await strapi.entityService.findOne('plugin::users-permissions.user', recipientId);
+            const recipient = await strapi.entityService.findOne('plugin::users-permissions.user', recipientId, { populate: '*' });
             if (!recipient) {
                 return ctx.notFound('Recipient not found');
             }
@@ -37,7 +37,7 @@ exports.default = {
                     type: existingChat.type,
                     name: existingChat.name,
                     lastActivity: existingChat.lastActivity,
-                    participants: existingChat.participants.map(p => ({
+                    participants: existingChat.participants.map((p) => ({
                         id: p.id,
                         username: p.username
                     }))
@@ -62,7 +62,7 @@ exports.default = {
             // Get the updated chat room with participants
             const updatedChatRoom = await strapi.db.query('api::chat-room.chat-room').findOne({
                 where: { id: chatRoom.id },
-                populate: '*' // Use wildcard to populate all relations
+                populate: '*'
             });
             return {
                 id: updatedChatRoom.id,
@@ -406,7 +406,7 @@ exports.default = {
                 return ctx.forbidden('You are not a participant in this chat room');
             }
             // Check if the user to add exists
-            const userToAdd = await strapi.entityService.findOne('plugin::users-permissions.user', userId);
+            const userToAdd = await strapi.entityService.findOne('plugin::users-permissions.user', userId, { populate: '*' });
             if (!userToAdd) {
                 return ctx.notFound('User not found');
             }

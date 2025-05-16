@@ -1,51 +1,81 @@
-
-// Define interfaces for query parameters
 interface CommentQueryFilters {
   product?: { id: string | number };
-  parentComment?: any | null;
+  parentComment?: null;
 }
 
 export default {
   /**
    * Create a new comment
    */
-  createComment: async (ctx) => {
-    // Same implementation as before...
-  },
-  
-  /**
-   * Get comments for a product
-   */
-  getProductComments: async (ctx) => {
-    const { productId } = ctx.params;
-    const { page = '1', limit = '10', parentOnly = 'true' } = ctx.query;
-    
+  async createComment(ctx) {
     try {
-      // Check if product exists
+      const { content, productId, parentCommentId } = ctx.request.body;
+
+      if (!content || !productId) {
+        return ctx.badRequest('Missing content or productId');
+      }
+
+      // Validate product exists
       const product = await strapi.db.query('api::product.product').findOne({
         where: { id: productId }
       });
-      
+
       if (!product) {
         return ctx.notFound('Product not found');
       }
-      
-      // Parse pagination parameters
-      const pageNumber = parseInt(page, 10);
-      const pageSize = parseInt(limit, 10);
-      
-      // Build query with proper typing
-      const queryFilters: CommentQueryFilters = { 
+
+      // Create the comment
+      const newComment = await strapi.db.query('api::comment.comment').create({
+        data: {
+          content,
+          product: productId,
+          author: ctx.state.user.id,
+          parentComment: parentCommentId || null
+        }
+      });
+
+      return ctx.created(newComment);
+    } catch (err) {
+      strapi.log.error('Error creating comment:', err);
+      return ctx.internalServerError('Could not create comment');
+    }
+  },
+
+  /**
+   * Get comments for a product with nested replies
+   */
+  async getProductComments(ctx) {
+    const { productId } = ctx.params;
+    const { page = '1', limit = '10', parentOnly = 'true' } = ctx.query;
+
+    try {
+      const pageNumber = Math.max(parseInt(page as string, 10), 1);
+      const pageSize = Math.max(parseInt(limit as string, 10), 1);
+
+      if (isNaN(pageNumber) || isNaN(pageSize)) {
+        return ctx.badRequest('Invalid pagination parameters');
+      }
+
+      // Check if the product exists
+      const product = await strapi.db.query('api::product.product').findOne({
+        where: { id: productId }
+      });
+
+      if (!product) {
+        return ctx.notFound('Product not found');
+      }
+
+      // Build filter for parent comments
+      const queryFilters: CommentQueryFilters = {
         product: { id: productId }
       };
-      
-      // Filter only parent comments if requested
+
       if (parentOnly === 'true') {
         queryFilters.parentComment = null;
       }
-      
-      // Build the complete query object
-      const query = {
+
+      // Fetch top-level (parent) comments
+      const parentComments = await strapi.db.query('api::comment.comment').findMany({
         where: queryFilters,
         populate: {
           author: {
@@ -55,19 +85,58 @@ export default {
         orderBy: { createdAt: 'desc' },
         offset: (pageNumber - 1) * pageSize,
         limit: pageSize
-      };
-      
-      // Get comments
-      const comments = await strapi.db.query('api::comment.comment').findMany(query);
-      
+      });
+
       // Get total count for pagination
-      const count = await strapi.db.query('api::comment.comment').count({
+      const total = await strapi.db.query('api::comment.comment').count({
         where: queryFilters
       });
-      
-      // Rest of the implementation...
+
+      // Fetch replies for these parent comments
+      const parentIds = parentComments.map((comment) => comment.id);
+
+      const replies = await strapi.db.query('api::comment.comment').findMany({
+        where: {
+          parentComment: { id: { $in: parentIds } }
+        },
+        populate: {
+          author: {
+            select: ['id', 'username', 'email', 'avatar']
+          }
+        },
+        orderBy: { createdAt: 'asc' }
+      });
+
+      // Group replies by parentComment ID
+      const repliesByParent: Record<number, any[]> = {};
+      replies.forEach((reply) => {
+        const parentId = reply.parentComment.id;
+        if (!repliesByParent[parentId]) {
+          repliesByParent[parentId] = [];
+        }
+        repliesByParent[parentId].push(reply);
+      });
+
+      // Attach replies to their parent comments
+      const commentsWithReplies = parentComments.map((comment) => ({
+        ...comment,
+        replies: repliesByParent[comment.id] || []
+      }));
+
+      // Respond with paginated comments and their replies
+      return ctx.send({
+        meta: {
+          page: pageNumber,
+          pageSize,
+          total,
+          pageCount: Math.ceil(total / pageSize)
+        },
+        data: commentsWithReplies
+      });
+
     } catch (err) {
-      // Error handling...
+      strapi.log.error('Error retrieving comments:', err);
+      return ctx.internalServerError('Could not fetch comments');
     }
   }
 };
