@@ -1,6 +1,7 @@
 {
   "/page": "app/page.js",
-  "/create-community/page": "app/create-community/page.js",
+  "/home/page": "app/home/page.js",
+  "/post/page": "app/post/page.js",
   "/create-post/page": "app/create-post/page.js",
-  "/home/page": "app/home/page.js"
+  "/create-community/page": "app/create-community/page.js"
 }

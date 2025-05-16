@@ -144,7 +144,6 @@ export default function Home() {
           <PostComment/>
 
         </div>
-        
       </div>
     </div>
   );
