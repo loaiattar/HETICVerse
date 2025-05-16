@@ -13,68 +13,19 @@ import { postsApi, communitiesApi } from '../../utils/api'
 export default function Post() {
   const router = useRouter()
   const [selectedButton, setSelectedButton] = useState('home')
-  const [postContent, setPostContent] = useState('')
-  const [postTitle, setPostTitle] = useState('')
-  const [selectedCommunity, setSelectedCommunity] = useState('')
-  const [communities, setCommunities] = useState([])
-  const [isSubmitting, setIsSubmitting] = useState(false)
+  const [isPanelOpen, setIsPanelOpen] = useState(false)
+  const [isUserPanelOpen, setIsUserPanelOpen] = useState(false)
 
-  useEffect(() => {
-    const fetchCommunities = async () => {
-      try {
-        const response = await communitiesApi.getAllCommunities()
-        if (response && response.data) {
-          setCommunities(response.data)
-        }
-      } catch (error) {
-        console.error('Error:', error)
-      }
-    }
-
-    fetchCommunities()
-  }, [])
+  const toggleUserPanel = () => {
+    setIsUserPanelOpen(!isUserPanelOpen)
+  }
 
   const handleButtonClick = (button) => {
     setSelectedButton(button)
-    if (button === 'home') {
-      router.push('/home')
-    } else if (button === 'tendancy') {
-      router.push('/home?view=tendancy')
-    } else if (button === 'all') {
-      router.push('/home?view=all')
-    }
   }
 
-  const handleSubmit = async (e) => {
-    e.preventDefault()
-    setIsSubmitting(true)
-
-    try {
-      const postData = {
-        title: postTitle,
-        content: postContent,
-        type: 'text',
-        communityId: selectedCommunity,
-        publishedAt: new Date().toISOString()
-      }
-
-      const response = await postsApi.createPost(postData)
-      console.log('Post created successfully:', response)
-      
-      setPostContent('')
-      setPostTitle('')
-      setSelectedCommunity('')
-      
-      // Redirect to the new post
-      if (response.data?.id) {
-        router.push(`/post/${response.data.id}`)
-      }
-    } catch (error) {
-      console.error('Complete error:', error)
-      alert(error.message || 'An error occurred while creating the post')
-    } finally {
-      setIsSubmitting(false)
-    }
+  const togglePanel = () => {
+    setIsPanelOpen(!isPanelOpen)
   }
 
   return (
@@ -163,62 +114,47 @@ export default function Post() {
             </div>
           </div>
           
-          <Link href="/create-post" className="flex flex-row justify-center items-center gap-1 px-2 py-2 rounded-full text-sm font-medium hover:bg-[#333D42]">
-            <svg xmlns="http://www.w3.org/2000/svg" height="24px" viewBox="0 -960 960 960" width="24px" fill="#FFFFFF"><path d="M440-440H200v-80h240v-240h80v240h240v80H520v240h-80v-240Z"/></svg>
-            Create
-          </Link>
-          <button className="p-1">
-            <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 17h5l-1.405-1.405A2.032 2.032 0 0118 14.158V11a6.002 6.002 0 00-4-5.659V5a2 2 0 10-4 0v.341C7.67 6.165 6 8.388 6 11v3.159c0 .538-.214 1.055-.595 1.436L4 17h5m6 0v1a3 3 0 11-6 0v-1m6 0H9" />
-            </svg>
-          </button>
-          <div className="w-8 h-8 bg-gray-200 rounded-full"></div>
-          <UserMenu />
+          <div className="flex items-center space-x-4">
+            <button onClick={togglePanel} className="flex flex-row justify-center items-center gap-1 px-2 py-2 rounded-full text-sm font-medium hover:bg-[#333D42]">
+                <svg xmlns="http://www.w3.org/2000/svg" height="24px" viewBox="0 -960 960 960" width="24px" fill="#FFFFFF"><path d="M440-440H200v-80h240v-240h80v240h240v80H520v240h-80v-240Z"/></svg>
+                Create
+              </button>
+              {isPanelOpen && (
+                <div className="flex flex-col gap-3 absolute top-15 bg-[#2B3236] p-6 rounded-xl text-center">
+                  <a href="create-post" className="block text-white hover:bg-[#333D42] rounded-xl">Create post</a>
+                  <div className='w-full h-px bg-[#C7C7C7]'></div>
+                  <a href="create-community" className="block text-white hover:bg-[#333D42] rounded-xl">Create Community</a>
+                </div>
+              )}
+              <button className="p-1">
+                <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 17h5l-1.405-1.405A2.032 2.032 0 0118 14.158V11a6.002 6.002 0 00-4-5.659V5a2 2 0 10-4 0v.341C7.67 6.165 6 8.388 6 11v3.159c0 .538-.214 1.055-.595 1.436L4 17h5m6 0v1a3 3 0 11-6 0v-1m6 0H9" />
+                </svg>
+              </button>
+              <div className="flex justify-center items-center w-11 h-11 rounded-full hover:bg-[#2B3236] ">
+                <button onClick={toggleUserPanel} className="w-8 h-8 bg-gray-200 rounded-full"></button>
+                {isUserPanelOpen && (
+                  <div className="flex w-max flex-col gap-3 absolute top-15 -translate-x-10 bg-[#2B3236] p-5 rounded-xl text-center">
+                    <a href="/login" className="block text-white hover:bg-[#333D42] rounded-xl">Log out</a>
+                  </div>
+                )}
+              </div>
+          </div>
         </header>
 
         <PostCard/>
 
-        <form onSubmit={handleSubmit} className="flex flex-col gap-4 w-full max-w-2xl">
-          <select
-            value={selectedCommunity}
-            onChange={(e) => setSelectedCommunity(e.target.value)}
-            className="w-full px-4 py-2 rounded-lg text-white bg-[#2B3236] border border-[#C7C7C7] focus:outline-none focus:ring-2 focus:ring-[#3FDEE1]"
-            required
-            disabled={isSubmitting}
-          >
-            <option value="">Select a community</option>
-            {communities.map((community) => (
-              <option key={community.id} value={community.id}>
-                {community.attributes.name}
-              </option>
-            ))}
-          </select>
-          <input
-            type="text"
-            placeholder="Post title"
-            className="w-full px-4 py-2 rounded-lg text-white bg-[#2B3236] border border-[#C7C7C7] placeholder-[#C7C7C7] focus:outline-none focus:ring-2 focus:ring-[#3FDEE1]"
-            value={postTitle}
-            onChange={(e) => setPostTitle(e.target.value)}
-            disabled={isSubmitting}
-            required
-          />
-          <input
-            type="text"
-            placeholder="Join the conversation"
-            className="w-full px-4 py-4 rounded-3xl text-white border border-[#C7C7C7] placeholder-[#C7C7C7] focus:outline-none focus:ring-2 focus:ring-[#3FDEE1]"
-            value={postContent}
-            onChange={(e) => setPostContent(e.target.value)}
-            disabled={isSubmitting}
-            required
-          />
-          <button
-            type="submit"
-            className="bg-[#105BCA] hover:bg-[#1B489D] text-white font-semibold px-4 py-2 rounded-full cursor-pointer"
-            disabled={isSubmitting}
-          >
-            {isSubmitting ? 'Posting...' : 'Post'}
-          </button>
-        </form>
+          <form>
+              <input
+              type="text"
+              placeholder="Join the conversation"
+              className="w-2xl px-13 py-4 rounded-3xl text-white border border-[#C7C7C7] placeholder-[#C7C7C7] placeholder- focus:outline-none focus:ring-2 focus:ring-[#3FDEE1]"
+              />
+          </form>
+
+          <PostComment/>
+
+        </div>
       </div>
     </div>
   );
