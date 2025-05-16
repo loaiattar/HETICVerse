@@ -72,7 +72,7 @@ export default function LogInPage() {
 
         <p className="text-sm text-center text-white mt-6">
           Pas encore de compte ?{" "}
-          <a href="/register" className="text-[#3FDEE1] hover:underline">
+          <a href="/" className="text-[#3FDEE1] hover:underline">
             S&apos;inscrire
           </a>
         </p>
