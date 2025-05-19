@@ -36,3 +36,4 @@ coverage/
 
 # === Optional ===
 public/static/cache/
+.vercel

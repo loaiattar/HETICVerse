@@ -15,6 +15,7 @@ export default function Home() {
   const [selectedButton, setSelectedButton] = useState('home')
   const [isPanelOpen, setIsPanelOpen] = useState(false)
   const [isUserPanelOpen, setIsUserPanelOpen] = useState(false)
+  const [posts, setPosts] = useState([])
 
   const toggleUserPanel = () => {
     setIsUserPanelOpen(!isUserPanelOpen)
@@ -27,6 +28,19 @@ export default function Home() {
   const togglePanel = () => {
     setIsPanelOpen(!isPanelOpen)
   }
+
+  useEffect(() => {
+    const fetchPosts = async () => {
+      try {
+        const response = await postsApi.getAllPosts()
+        setPosts(response)
+      } catch (error) {
+        console.error('Erreur lors de la récupération des publications:', error)
+      }
+    }
+
+    fetchPosts()
+  }, [])
   
   return (
     <div className="flex min-h-screen bg-[#121212]">
@@ -145,7 +159,9 @@ export default function Home() {
         </header>
         
         <div className="flex flex-column Justify-center items-center px-35 py-5">
-          <PostCard/>
+          {posts.map(post => (
+            <PostCard key={post.id} post={post} />
+          ))}
         </div>
       </div>
     </div>
